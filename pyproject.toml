@@ -1,0 +1,18 @@
+[project]
+name = "agent-harness-lab"
+version = "0.1.0"
+description = "A reproducible Issue-to-PR agent harness built on Deep Agents."
+readme = "README.md"
+requires-python = ">=3.11,<3.14"
+dependencies = [
+    "deepagents>=0.7.32,<0.8",
+]
+
+[dependency-groups]
+test = [
+    "pytest>=8.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
