@@ -17,8 +17,8 @@ Issue
 ## 当前进度
 
 - [x] Backend CRUD、路径映射和 CompositeBackend 路由实验
-- [ ] 最小 Issue-to-PR Baseline
-- [ ] Policy Middleware
+- [x] 最小 Issue-to-PR Baseline（10 个任务已完成）
+- [x] Policy Middleware v1
 - [ ] Recovery Middleware
 - [ ] Checkpoint 和 Replay
 - [ ] 任务评测集和对比实验
@@ -51,3 +51,40 @@ Backend 实验位于：
 - docs/backend-experiment-report.md
 
 该实验不依赖模型或 API Key，验证 StateBackend、FilesystemBackend 和 CompositeBackend 的存储、路径和路由行为。
+
+## 运行最小 Baseline
+
+Baseline 通过 DeepSeek 的 OpenAI 兼容接口调用模型。先在 DeepSeek 控制台创建 API Key，并确认账号可以使用要配置的模型。准备 Python 3.11+ 和 uv 后，在仓库根目录运行：
+
+~~~powershell
+uv sync --all-groups
+Copy-Item .env.example .env
+~~~
+
+首次运行前编辑仓库根目录的 .env，填入你自己的 DeepSeek API Key 和模型 ID：
+
+~~~dotenv
+DEEPSEEK_API_KEY=your-deepseek-api-key
+DEEPSEEK_MODEL=deepseek-flash
+DEEPSEEK_BASE_URL=https://api.deepseek.com
+~~~
+
+之后每次只需运行：
+
+~~~powershell
+uv run agent-harness --task-id calculator-add-floats
+~~~
+
+默认 Base URL 使用 DeepSeek 官方 OpenAI 兼容接口。如果你的账号使用代理或兼容网关，请将 DEEPSEEK_BASE_URL 设置为对应地址。DEEPSEEK_MODEL 必须填写该账号可用的模型 ID。
+
+本地 .env 已加入 .gitignore，不会被 Git 跟踪。不要把真实 API Key 写进 .env.example 或提交到仓库。
+
+Agent 会把 toy 项目复制到 runs/<run-id>/workspace/，在副本中工作。它只能使用 Deep Agents 文件工具和固定的 pytest 工具，不接收任意 shell 命令。每次运行生成 diff.patch 和 run.json。
+
+Baseline 运行现在还接入了第一版 Policy Middleware：工具调用必须通过 allowlist，文件路径拒绝路径穿越和敏感文件，删除与未知工具默认拒绝，单次运行最多允许 30 次工具调用。每次策略允许或拒绝都会写入 `run.json.events`。这属于工具调用级保护，不等同于操作系统沙箱。
+
+默认任务项目位于 examples/tiny_python_project/。10 条可重复任务定义在 evals/tasks.json。本机无 API Key 时仍可运行离线测试：
+
+~~~powershell
+uv run pytest
+~~~

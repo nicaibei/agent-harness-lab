@@ -1,0 +1,42 @@
+[
+  {
+    "id": "calculator-add-floats",
+    "issue": "Update add so its behavior is explicitly covered for floating-point inputs. Add a test for add(1.25, 2.5) returning 3.75."
+  },
+  {
+    "id": "calculator-subtract-negative",
+    "issue": "Add a test proving subtract(3, 8) returns -5. Inspect the existing implementation and change it only if needed."
+  },
+  {
+    "id": "calculator-divide-fraction",
+    "issue": "Add a test proving divide(1, 4) returns 0.25. Inspect the existing implementation and change it only if needed."
+  },
+  {
+    "id": "calculator-add-negative-mixed",
+    "issue": "Add a test proving add(-2, 5) returns 3. Inspect the existing implementation and change it only if needed."
+  },
+  {
+    "id": "calculator-subtract-floats",
+    "issue": "Add a test proving subtract(5.5, 2.0) returns 3.5. Inspect the existing implementation and change it only if needed."
+  },
+  {
+    "id": "calculator-divide-negative",
+    "issue": "Add a test proving divide(-6, 2) returns -3. Inspect the existing implementation and change it only if needed."
+  },
+  {
+    "id": "calculator-divide-zero-numerator",
+    "issue": "Add a test proving divide(0, 4) returns 0. Inspect the existing implementation and change it only if needed."
+  },
+  {
+    "id": "calculator-add-rejects-text",
+    "issue": "Make add reject non-numeric operands with TypeError instead of concatenating text. Add a regression test proving add('2', '3') raises TypeError, while preserving the existing numeric behavior."
+  },
+  {
+    "id": "calculator-multiply",
+    "issue": "Add a multiply(left, right) function to calculator.py that returns the product, and add a test proving multiply(6, 7) returns 42. Keep the existing calculator behavior unchanged."
+  },
+  {
+    "id": "calculator-subtract-zero",
+    "issue": "Add a test proving subtract(9, 0) returns 9. Inspect the existing implementation and change it only if needed."
+  }
+]

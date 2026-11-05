@@ -6,12 +6,24 @@ readme = "README.md"
 requires-python = ">=3.11,<3.14"
 dependencies = [
     "deepagents>=0.7.32,<0.8",
+    "langchain-openai>=1.7.3,<2.0.0",
+    "python-dotenv>=1.0,<2.0",
 ]
 
 [dependency-groups]
 test = [
     "pytest>=8.0",
 ]
+
+[project.scripts]
+agent-harness = "agent_app.baseline:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["agent_app*", "harness*", "evals*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
