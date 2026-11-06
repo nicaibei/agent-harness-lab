@@ -100,6 +100,7 @@ def _case_result(
     ]
     changed_action = len({json.dumps(call, sort_keys=True) for call in calls}) > 1
     final_message = messages[-1] if messages else None
+    tests_passed = test_results[-1].get("success") if test_results else None
     return {
         "case_id": case_id,
         "correction_type": correction_type,
@@ -111,8 +112,12 @@ def _case_result(
         "tool_calls": calls,
         "action_changed": changed_action,
         "diff": diff,
-        "final_success": isinstance(final_message, AIMessage) and final_message.content == "finished",
-        "tests_passed": test_results[-1].get("success") if test_results else None,
+        "final_success": (
+            isinstance(final_message, AIMessage)
+            and final_message.content == "finished"
+            and tests_passed is not False
+        ),
+        "tests_passed": tests_passed,
     }
 
 
@@ -189,14 +194,55 @@ def _test_failure_case() -> dict[str, object]:
     return _case_result("test-failure", "model_correction", result, events, diff)
 
 
+def _unresolved_test_failure_case() -> dict[str, object]:
+    """Measure a changed but ineffective repair that must remain failed."""
+    events: list[dict[str, Any]] = []
+
+    with TemporaryDirectory() as directory:
+        workspace = Path(directory)
+
+        @tool
+        def run_injected_tests(fix: bool = False) -> str:
+            """Keep failing even after the model requests a test rerun."""
+            output = "still 1 failed" if fix else "1 failed"
+            return json.dumps({"success": False, "exit_code": 1, "output": output})
+
+        @tool
+        def apply_wrong_fix() -> str:
+            """Write an ineffective repair to create a visible diff."""
+            (workspace / "wrong-fix.txt").write_text("still wrong\n", encoding="utf-8")
+            return "wrong fix applied"
+
+        responses = [
+            AIMessage(content="", tool_calls=[{"name": "run_injected_tests", "args": {"fix": False}, "id": "test-1"}]),
+            AIMessage(content="", tool_calls=[{"name": "apply_wrong_fix", "args": {}, "id": "fix-1"}]),
+            AIMessage(content="", tool_calls=[{"name": "run_injected_tests", "args": {"fix": True}, "id": "test-2"}]),
+            AIMessage(content="finished"),
+        ]
+        result, diff = _run_agent(workspace, [run_injected_tests, apply_wrong_fix], responses, events)
+    return _case_result("unresolved-test-failure", "model_correction_failed", result, events, diff)
+
+
 def build_fault_report() -> dict[str, object]:
     """Run all deterministic fault-injection cases and summarize them."""
-    cases = [_transient_timeout_case(), _wrong_argument_case(), _test_failure_case()]
+    cases = [
+        _transient_timeout_case(),
+        _wrong_argument_case(),
+        _test_failure_case(),
+        _unresolved_test_failure_case(),
+    ]
     return {
         "generated_at": datetime.now(UTC).isoformat(),
         "case_count": len(cases),
         "successful_cases": sum(case["final_success"] is True for case in cases),
-        "model_correction_cases": sum(case["correction_type"] == "model_correction" for case in cases),
+        "model_correction_cases": sum(
+            str(case["correction_type"]).startswith("model_correction") for case in cases
+        ),
+        "successful_model_corrections": sum(
+            case["correction_type"] == "model_correction" and case["final_success"] is True
+            for case in cases
+        ),
+        "failed_cases": sum(case["final_success"] is False for case in cases),
         "middleware_retry_cases": sum(case["correction_type"] == "middleware_retry" for case in cases),
         "cases": cases,
     }
@@ -209,8 +255,10 @@ def render_markdown(report: dict[str, object]) -> str:
         "",
         f"- 案例数：{report['case_count']}",
         f"- 最终成功：{report['successful_cases']}",
+        f"- 最终失败：{report['failed_cases']}",
         f"- Middleware 自动重试：{report['middleware_retry_cases']}",
-        f"- 模型纠错：{report['model_correction_cases']}",
+        f"- 模型采取修复动作：{report['model_correction_cases']}",
+        f"- 模型修复成功：{report['successful_model_corrections']}",
         "",
         "| 案例 | 类型 | 动作变化 | 测试通过 | diff | 最终成功 |",
         "| --- | --- | --- | --- | ---: | --- |",

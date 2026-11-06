@@ -10,16 +10,22 @@ from evals.fault_injection import build_fault_report, write_fault_report
 def test_fault_report_distinguishes_middleware_retry_and_model_correction() -> None:
     report = build_fault_report()
 
-    assert report["case_count"] == 3
+    assert report["case_count"] == 4
     assert report["successful_cases"] == 3
+    assert report["failed_cases"] == 1
     assert report["middleware_retry_cases"] == 1
-    assert report["model_correction_cases"] == 2
+    assert report["model_correction_cases"] == 3
+    assert report["successful_model_corrections"] == 2
     cases = {case["case_id"]: case for case in report["cases"]}
     assert cases["transient-timeout"]["action_changed"] is False
     assert cases["wrong-argument"]["action_changed"] is True
     assert cases["test-failure"]["action_changed"] is True
     assert cases["test-failure"]["tests_passed"] is True
     assert cases["test-failure"]["diff"]
+    assert cases["unresolved-test-failure"]["action_changed"] is True
+    assert cases["unresolved-test-failure"]["tests_passed"] is False
+    assert cases["unresolved-test-failure"]["final_success"] is False
+    assert cases["unresolved-test-failure"]["diff"]
 
 
 def test_fault_report_writes_json_and_markdown(tmp_path: Path) -> None:

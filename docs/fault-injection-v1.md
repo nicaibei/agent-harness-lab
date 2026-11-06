@@ -74,6 +74,9 @@ recovery_failure
 | `transient-timeout` | Middleware 重试 | 否 | 0 | 是 |
 | `wrong-argument` | 模型纠错 | 是 | 0 | 是 |
 | `test-failure` | 模型纠错 | 是 | 51 字符 | 是 |
+| `unresolved-test-failure` | 模型纠错但失败 | 是 | 非空 | 否 |
+
+四个案例中，1 个由 Middleware 自动重试，3 个由模型采取了不同的修复动作，其中 2 个最终修复成功，1 个仍然失败。
 
 报告文件：
 
@@ -94,6 +97,12 @@ python -m evals.fault_injection --output-dir evals/reports
 4. 测试失败结果是一个正常返回的工具结果，不等于工具抛出异常；Recovery 必须把两者区分开。
 5. 离线故障注入适合验证 Harness 语义，真实模型实验仍需要后续单独进行。
 
+### 负面案例的意义
+
+`unresolved-test-failure` 第一次测试失败后调用了 `apply_wrong_fix`，工作区确实产生了 diff，但最后一次测试仍返回 `success=false`。因此 Harness 将 `final_success` 记录为 `false`。
+
+这个案例证明评测器不会因为模型“做过修改”或最终返回了结束消息，就把未通过测试的任务误报为成功。
+
 ## 当前限制
 
-本轮使用确定性的假模型响应，证明的是 Harness 能否正确处理三类失败，不代表 DeepSeek 在开放式任务中一定会采取相同的修复动作。下一步可以增加失败后仍未修复的案例，以及跨文件真实修复任务。
+本轮使用确定性的假模型响应，证明的是 Harness 能否正确处理四类失败，不代表 DeepSeek 在开放式任务中一定会采取相同的修复动作。下一步可以进行跨文件真实修复任务。

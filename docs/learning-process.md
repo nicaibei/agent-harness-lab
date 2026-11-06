@@ -313,10 +313,6 @@ Checkpoint v1 先使用 `InMemorySaver` 证明机制，不立即增加 SQLite �
 
 实验报告见 [evaluation-v1.md](evaluation-v1.md)。
 
-## 下一阶段：故障注入评测
-
-下一阶段加入可重复的测试失败、错误参数和暂时性工具异常，观察模型是否能够修正动作，以及 Policy、Recovery 和事件日志是否准确记录每一步。这个阶段才开始测量 Agent 的纠错能力，而不是只测量它完成简单任务的能力。
-
 ## 阶段 6：故障注入与 Recovery 纠错评测 v1
 
 ### 目标和设计判断
@@ -327,21 +323,22 @@ Checkpoint v1 先使用 `InMemorySaver` 证明机制，不立即增加 SQLite �
 
 ### 实现和证据
 
-`evals/fault_injection.py` 运行三个确定性案例并生成 JSON、Markdown 报告。结果为：
+`evals/fault_injection.py` 运行四个确定性案例并生成 JSON、Markdown 报告。结果为：
 
 - 1 个 Middleware 自动重试案例；
-- 2 个模型纠错案例；
-- 3/3 最终成功；
+- 3 个模型采取不同动作的案例；
+- 3/4 最终成功；
 - 错误参数案例的第二次参数不同；
-- 测试失败案例产生 diff，且第二次测试通过。
+- 一个测试失败案例产生 diff 且第二次测试通过；
+- 一个负面案例产生 diff 但第二次测试仍失败。
 
-本轮全量测试结果为 `34 passed`。由于使用假模型，结果证明的是 Harness 对失败的处理语义，不代表真实模型在开放式任务中一定能修复代码。
+本轮全量测试结果为 `34 passed`。四个案例中，2 个模型修复成功，1 个模型改变动作但仍失败。由于使用假模型，结果证明的是 Harness 对失败的处理语义，不代表真实模型在开放式任务中一定能修复代码。
 
 实验报告见 [fault-injection-v1.md](fault-injection-v1.md)。
 
-## 下一阶段：失败后仍未修复的案例
+## 下一阶段：真实任务中的纠错对比
 
-下一步加入模型改变动作但仍然失败的负面案例，观察 Harness 是否正确记录 `recovery_terminal`、最终测试失败和未完成状态，再比较不同 Middleware 组合的运行结果。
+负面故障注入已经证明评测器能区分“采取过修复动作”和“最终修复成功”。下一步可以把同样的指标应用到真实 DeepSeek 任务，比较 Baseline、Recovery 和完整 Harness 在测试失败后的恢复率。
 
 ## 学习和工程纪律
 

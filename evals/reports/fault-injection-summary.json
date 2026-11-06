@@ -1,8 +1,10 @@
 {
-  "generated_at": "2026-11-06T09:21:22.027603+00:00",
-  "case_count": 3,
+  "generated_at": "2026-11-06T10:05:53.783469+00:00",
+  "case_count": 4,
   "successful_cases": 3,
-  "model_correction_cases": 2,
+  "model_correction_cases": 3,
+  "successful_model_corrections": 2,
+  "failed_cases": 1,
   "middleware_retry_cases": 1,
   "cases": [
     {
@@ -151,6 +153,70 @@
       "diff": "--- /dev/null\n+++ b/fixed.txt\n@@ -0,0 +1 @@\n+fixed\n",
       "final_success": true,
       "tests_passed": true
+    },
+    {
+      "case_id": "unresolved-test-failure",
+      "correction_type": "model_correction_failed",
+      "first_failure": {
+        "event": "recovery_failure",
+        "tool": "run_injected_tests",
+        "category": "tool_error",
+        "attempt": 1,
+        "error": "{\"success\": false, \"exit_code\": 1, \"output\": \"1 failed\"}"
+      },
+      "events": [
+        {
+          "event": "recovery_failure",
+          "tool": "run_injected_tests",
+          "category": "tool_error",
+          "attempt": 1,
+          "error": "{\"success\": false, \"exit_code\": 1, \"output\": \"1 failed\"}"
+        },
+        {
+          "event": "recovery_terminal",
+          "tool": "run_injected_tests",
+          "category": "tool_error"
+        },
+        {
+          "event": "recovery_success",
+          "tool": "apply_wrong_fix",
+          "attempt": 1
+        },
+        {
+          "event": "recovery_failure",
+          "tool": "run_injected_tests",
+          "category": "tool_error",
+          "attempt": 1,
+          "error": "{\"success\": false, \"exit_code\": 1, \"output\": \"still 1 failed\"}"
+        },
+        {
+          "event": "recovery_terminal",
+          "tool": "run_injected_tests",
+          "category": "tool_error"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "run_injected_tests",
+          "args": {
+            "fix": false
+          }
+        },
+        {
+          "name": "apply_wrong_fix",
+          "args": {}
+        },
+        {
+          "name": "run_injected_tests",
+          "args": {
+            "fix": true
+          }
+        }
+      ],
+      "action_changed": true,
+      "diff": "--- /dev/null\n+++ b/wrong-fix.txt\n@@ -0,0 +1 @@\n+still wrong\n",
+      "final_success": false,
+      "tests_passed": false
     }
   ]
 }
