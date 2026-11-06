@@ -20,7 +20,9 @@ from deepagents import create_deep_agent
 from deepagents.backends import FilesystemBackend
 from langchain_core.messages import HumanMessage, ToolMessage
 from langchain_core.tools import BaseTool, tool
+from langgraph.checkpoint.memory import InMemorySaver
 
+from harness.checkpoint import replay_events, summarize_checkpoints
 from harness.policy import PolicyMiddleware
 from harness.recovery import RecoveryMiddleware
 
@@ -83,7 +85,14 @@ def _build_diff(before: dict[str, str], after: dict[str, str]) -> str:
     return "".join(chunks)
 
 
-def _save_run_artifacts(run_dir: Path, report: dict[str, Any], diff: str) -> None:
+def _save_run_artifacts(
+    run_dir: Path,
+    report: dict[str, Any],
+    diff: str,
+    *,
+    checkpoint: dict[str, Any] | None = None,
+    replay: dict[str, Any] | None = None,
+) -> None:
     """Persist run artifacts even if the workspace removed its parent directory."""
     run_dir.mkdir(parents=True, exist_ok=True)
     (run_dir / "diff.patch").write_text(diff, encoding="utf-8")
@@ -91,6 +100,16 @@ def _save_run_artifacts(run_dir: Path, report: dict[str, Any], diff: str) -> Non
         json.dumps(report, ensure_ascii=False, indent=2),
         encoding="utf-8",
     )
+    if checkpoint is not None:
+        (run_dir / "checkpoint.json").write_text(
+            json.dumps(checkpoint, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
+    if replay is not None:
+        (run_dir / "replay.json").write_text(
+            json.dumps(replay, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
 
 
 def _record_event(events: list[dict[str, Any]], event: str, **details: Any) -> None:
@@ -208,6 +227,8 @@ def run_task(issue: str, project: Path, *, task_id: str | None = None) -> Path:
         on_decision=lambda decision: _record_event(events, "policy_decision", **decision),
     )
     recovery = RecoveryMiddleware(on_event=record_recovery_event)
+    checkpointer = InMemorySaver()
+    run_config = {"configurable": {"thread_id": run_id}}
     agent = create_deep_agent(
         model=ChatOpenAI(
             model=model_name,
@@ -217,6 +238,7 @@ def run_task(issue: str, project: Path, *, task_id: str | None = None) -> Path:
         backend=FilesystemBackend(root_dir=workspace, virtual_mode=True),
         tools=[test_tool],
         middleware=[policy, recovery],
+        checkpointer=checkpointer,
         system_prompt=(
             "You are a careful coding agent working in a disposable copy of a "
             "small Python project. Use filesystem tools to inspect and edit files. "
@@ -226,7 +248,10 @@ def run_task(issue: str, project: Path, *, task_id: str | None = None) -> Path:
     _record_event(events, "agent_started", model=model_name, base_url=base_url)
     execution_error = None
     try:
-        response = agent.invoke({"messages": [HumanMessage(content=_task_prompt(issue))]})
+        response = agent.invoke(
+            {"messages": [HumanMessage(content=_task_prompt(issue))]},
+            config=run_config,
+        )
     except Exception as error:  # noqa: BLE001 - retain a trace for failed agent runs
         response = {}
         execution_error = f"{type(error).__name__}: {error}"
@@ -266,6 +291,8 @@ def run_task(issue: str, project: Path, *, task_id: str | None = None) -> Path:
     )
     _record_event(events, "diff_created", changed=bool(diff), characters=len(diff))
     completed = execution_error is None
+    checkpoint_report = summarize_checkpoints(checkpointer, run_config)
+    _record_event(events, "checkpoint_summary", **checkpoint_report)
     _record_event(
         events,
         "run_finished",
@@ -290,8 +317,17 @@ def run_task(issue: str, project: Path, *, task_id: str | None = None) -> Path:
         "test_runs": test_runs,
         "diff": diff,
         "events": events,
+        "checkpoint": checkpoint_report,
     }
-    _save_run_artifacts(run_dir, report, diff)
+    replay_report = replay_events(events)
+    report["replay"] = replay_report
+    _save_run_artifacts(
+        run_dir,
+        report,
+        diff,
+        checkpoint=checkpoint_report,
+        replay=replay_report,
+    )
     return run_dir
 
 

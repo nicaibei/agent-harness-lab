@@ -20,7 +20,7 @@ Issue
 - [x] 最小 Issue-to-PR Baseline（10 个任务已完成）
 - [x] Policy Middleware v1/v2
 - [x] Recovery Middleware v1
-- [ ] Checkpoint 和 Replay
+- [x] Checkpoint/Replay v1（内存 checkpoint、工具边界恢复、事件 replay）
 - [ ] 任务评测集和对比实验
 
 ## 目录结构
@@ -42,6 +42,8 @@ agent-harness-lab/
 1. 它解决了哪一种 Agent 失败模式？
 2. 如何用实验或测试证明它有效？
 3. 为什么它应该属于 Harness 层，而不是普通 Tool 层？
+
+完整的阶段复盘和学习过程记录见 [docs/learning-process.md](docs/learning-process.md)。
 
 ## 当前实验
 

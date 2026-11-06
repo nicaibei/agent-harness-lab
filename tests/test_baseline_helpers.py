@@ -92,3 +92,18 @@ def test_save_run_artifacts_preserves_run_events(tmp_path: Path) -> None:
     saved = (run_dir / "run.json").read_text(encoding="utf-8")
     assert '"event": "run_started"' in saved
     assert '"event": "run_finished"' in saved
+
+
+def test_save_run_artifacts_writes_checkpoint_and_replay_reports(tmp_path: Path) -> None:
+    run_dir = tmp_path / "run"
+
+    _save_run_artifacts(
+        run_dir,
+        {"completed": True},
+        "diff",
+        checkpoint={"checkpoint_count": 3},
+        replay={"mode": "events-only"},
+    )
+
+    assert '"checkpoint_count": 3' in (run_dir / "checkpoint.json").read_text(encoding="utf-8")
+    assert '"mode": "events-only"' in (run_dir / "replay.json").read_text(encoding="utf-8")

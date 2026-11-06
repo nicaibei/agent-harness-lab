@@ -19,9 +19,10 @@
 - Implemented Recovery Middleware v1 for transient retries, terminal-error classification, and repeated-call detection.
 - Added Agent-graph integration coverage for a timeout followed by a successful retry.
 - Added model-facing recovery tests for corrected tool arguments and injected test failures.
+- Added Checkpoint/Replay v1 with LangGraph `InMemorySaver`, tool-boundary interruption and resume, checkpoint artifacts, and side-effect-free event replay.
 
 ## Next
 
 - Preserve the 10-task Baseline matrix as the comparison set for the first enhanced Harness version.
-- Add structured setup-error reporting before testing checkpoint and replay behavior.
-- Add injected test-failure recovery for the Baseline `run_tests` tool.
+- Evaluate whether cross-process checkpoint persistence is needed before adding a database dependency.
+- Compare Baseline, Policy, Recovery, and Checkpoint/Replay metrics on the preserved 10-task matrix.
