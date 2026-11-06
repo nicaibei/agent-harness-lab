@@ -20,9 +20,13 @@
 - Added Agent-graph integration coverage for a timeout followed by a successful retry.
 - Added model-facing recovery tests for corrected tool arguments and injected test failures.
 - Added Checkpoint/Replay v1 with LangGraph `InMemorySaver`, tool-boundary interruption and resume, checkpoint artifacts, and side-effect-free event replay.
+- Added an offline evaluation report that separates model/setup failures from Agent task outcomes and keeps latest-valid per-task summaries.
+- Added deterministic fault-injection cases for transient retry, changed tool arguments, and test failure followed by a file-changing fix.
 
 ## Next
 
 - Preserve the 10-task Baseline matrix as the comparison set for the first enhanced Harness version.
 - Evaluate whether cross-process checkpoint persistence is needed before adding a database dependency.
 - Compare Baseline, Policy, Recovery, and Checkpoint/Replay metrics on the preserved 10-task matrix.
+- Add controlled fault-injection tasks that produce test failures and parameter errors for Recovery evaluation.
+- Add negative fault-injection cases where the model changes its action but still fails, and compare failure traces across Harness versions.

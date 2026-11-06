@@ -1,0 +1,156 @@
+{
+  "generated_at": "2026-11-06T09:21:22.027603+00:00",
+  "case_count": 3,
+  "successful_cases": 3,
+  "model_correction_cases": 2,
+  "middleware_retry_cases": 1,
+  "cases": [
+    {
+      "case_id": "transient-timeout",
+      "correction_type": "middleware_retry",
+      "first_failure": {
+        "event": "recovery_failure",
+        "tool": "flaky_tool",
+        "category": "transient",
+        "attempt": 1,
+        "error": "temporary timeout"
+      },
+      "events": [
+        {
+          "event": "recovery_failure",
+          "tool": "flaky_tool",
+          "category": "transient",
+          "attempt": 1,
+          "error": "temporary timeout"
+        },
+        {
+          "event": "recovery_retry",
+          "tool": "flaky_tool",
+          "attempt": 2
+        },
+        {
+          "event": "recovery_success",
+          "tool": "flaky_tool",
+          "attempt": 2
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "flaky_tool",
+          "args": {
+            "value": "x"
+          }
+        }
+      ],
+      "action_changed": false,
+      "diff": "",
+      "final_success": true,
+      "tests_passed": null
+    },
+    {
+      "case_id": "wrong-argument",
+      "correction_type": "model_correction",
+      "first_failure": {
+        "event": "recovery_failure",
+        "tool": "validate_value",
+        "category": "exception",
+        "attempt": 1,
+        "error": "value must be 'correct'"
+      },
+      "events": [
+        {
+          "event": "recovery_failure",
+          "tool": "validate_value",
+          "category": "exception",
+          "attempt": 1,
+          "error": "value must be 'correct'"
+        },
+        {
+          "event": "recovery_terminal",
+          "tool": "validate_value",
+          "category": "exception"
+        },
+        {
+          "event": "recovery_success",
+          "tool": "validate_value",
+          "attempt": 1
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "validate_value",
+          "args": {
+            "value": "wrong"
+          }
+        },
+        {
+          "name": "validate_value",
+          "args": {
+            "value": "correct"
+          }
+        }
+      ],
+      "action_changed": true,
+      "diff": "",
+      "final_success": true,
+      "tests_passed": null
+    },
+    {
+      "case_id": "test-failure",
+      "correction_type": "model_correction",
+      "first_failure": {
+        "event": "recovery_failure",
+        "tool": "run_injected_tests",
+        "category": "tool_error",
+        "attempt": 1,
+        "error": "{\"success\": false, \"exit_code\": 1, \"output\": \"1 failed\"}"
+      },
+      "events": [
+        {
+          "event": "recovery_failure",
+          "tool": "run_injected_tests",
+          "category": "tool_error",
+          "attempt": 1,
+          "error": "{\"success\": false, \"exit_code\": 1, \"output\": \"1 failed\"}"
+        },
+        {
+          "event": "recovery_terminal",
+          "tool": "run_injected_tests",
+          "category": "tool_error"
+        },
+        {
+          "event": "recovery_success",
+          "tool": "apply_fix",
+          "attempt": 1
+        },
+        {
+          "event": "recovery_success",
+          "tool": "run_injected_tests",
+          "attempt": 1
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "run_injected_tests",
+          "args": {
+            "fix": false
+          }
+        },
+        {
+          "name": "apply_fix",
+          "args": {}
+        },
+        {
+          "name": "run_injected_tests",
+          "args": {
+            "fix": true
+          }
+        }
+      ],
+      "action_changed": true,
+      "diff": "--- /dev/null\n+++ b/fixed.txt\n@@ -0,0 +1 @@\n+fixed\n",
+      "final_success": true,
+      "tests_passed": true
+    }
+  ]
+}

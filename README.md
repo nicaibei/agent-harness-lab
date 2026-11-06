@@ -21,6 +21,8 @@ Issue
 - [x] Policy Middleware v1/v2
 - [x] Recovery Middleware v1
 - [x] Checkpoint/Replay v1（内存 checkpoint、工具边界恢复、事件 replay）
+- [x] 离线评测与失败分类 v1
+- [x] 故障注入与 Recovery 纠错评测 v1
 - [ ] 任务评测集和对比实验
 
 ## 目录结构
@@ -44,6 +46,12 @@ agent-harness-lab/
 3. 为什么它应该属于 Harness 层，而不是普通 Tool 层？
 
 完整的阶段复盘和学习过程记录见 [docs/learning-process.md](docs/learning-process.md)。
+
+可以用下面的命令从已有 `runs/` 产物生成评测汇总：
+
+~~~powershell
+python -m evals.report --runs-dir runs --output-dir evals/reports
+~~~
 
 ## 当前实验
 

@@ -291,9 +291,57 @@ Baseline 现在把 `run_id` 作为 `thread_id` 传给 `create_deep_agent()`，�
 
 实验报告见 [checkpoint-replay-v1.md](checkpoint-replay-v1.md)。
 
-## 下一阶段：评测和持久化取舍
+## Checkpoint v1 的持久化取舍
 
-下一阶段先比较 Baseline、Policy、Recovery 和 Checkpoint/Replay 在十任务矩阵上的结果，再决定是否需要 SQLite 等跨进程 checkpoint。新增持久化依赖前，要先证明内存 checkpoint 已经无法满足实验问题。
+Checkpoint v1 先使用 `InMemorySaver` 证明机制，不立即增加 SQLite 等依赖。是否需要跨进程持久化，应由后续评测和恢复场景的实际需求决定。
+
+## 阶段 5：评测与失败分类 v1
+
+### 目标和设计判断
+
+这一阶段把 `runs/` 中的运行产物转成可比较的证据。评测器逐个读取 `run.json`，只在内存中保存短摘要，完整日志和 diff 继续保留在磁盘。
+
+报告同时保存全部尝试和每个任务的 `latest_valid_attempt`。模型连接、额度、模型 ID 等基础设施问题单独分类，不覆盖 Agent 真正开始执行后的任务结果。
+
+### 实现和证据
+
+`evals/report.py` 目前支持 `success`、`test_failure`、`model_error`、`setup_error`、`agent_error` 和 `invalid_artifact` 分类，并输出 JSON 和 Markdown 报告。
+
+现有 14 次运行的结果是：11 次成功、3 次模型服务错误；全部尝试成功率为 78.6%，排除基础设施错误后的有效尝试成功率为 100%，10 个任务的最新有效结果全部成功。
+
+这组结果不能说明 Recovery 已经具备真实代码纠错能力，因为目前没有有效的测试失败运行。下一步是加入受控故障注入任务，再比较模型是否能根据错误修正工具参数或代码。
+
+实验报告见 [evaluation-v1.md](evaluation-v1.md)。
+
+## 下一阶段：故障注入评测
+
+下一阶段加入可重复的测试失败、错误参数和暂时性工具异常，观察模型是否能够修正动作，以及 Policy、Recovery 和事件日志是否准确记录每一步。这个阶段才开始测量 Agent 的纠错能力，而不是只测量它完成简单任务的能力。
+
+## 阶段 6：故障注入与 Recovery 纠错评测 v1
+
+### 目标和设计判断
+
+十个计算器任务都成功，不能证明 Agent 有纠错能力，因为没有有效的测试失败。阶段 6 使用离线假模型主动制造三类失败：暂时性超时、错误参数和失败测试结果。
+
+超时案例只验证 Recovery 自动重试；错误参数和测试失败案例要求模型看到错误后生成不同动作。测试失败案例还必须同时检查工作区 diff 和后续测试结果，避免把“改过文件”误判成“改对了”。
+
+### 实现和证据
+
+`evals/fault_injection.py` 运行三个确定性案例并生成 JSON、Markdown 报告。结果为：
+
+- 1 个 Middleware 自动重试案例；
+- 2 个模型纠错案例；
+- 3/3 最终成功；
+- 错误参数案例的第二次参数不同；
+- 测试失败案例产生 diff，且第二次测试通过。
+
+本轮全量测试结果为 `34 passed`。由于使用假模型，结果证明的是 Harness 对失败的处理语义，不代表真实模型在开放式任务中一定能修复代码。
+
+实验报告见 [fault-injection-v1.md](fault-injection-v1.md)。
+
+## 下一阶段：失败后仍未修复的案例
+
+下一步加入模型改变动作但仍然失败的负面案例，观察 Harness 是否正确记录 `recovery_terminal`、最终测试失败和未完成状态，再比较不同 Middleware 组合的运行结果。
 
 ## 学习和工程纪律
 

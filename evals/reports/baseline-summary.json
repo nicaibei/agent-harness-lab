@@ -1,0 +1,287 @@
+{
+  "generated_at": "2026-11-06T09:04:51.459288+00:00",
+  "runs_directory": "runs",
+  "attempt_count": 14,
+  "task_count": 10,
+  "category_counts": {
+    "model_error": 3,
+    "success": 11
+  },
+  "success_count": 11,
+  "attempt_success_rate": 0.7857142857142857,
+  "valid_attempt_count": 11,
+  "valid_success_count": 11,
+  "valid_success_rate": 1.0,
+  "task_summaries": {
+    "calculator-add-floats": {
+      "attempt_count": 2,
+      "latest_attempt": {
+        "run_id": "20261105T065422Z-83adadc7",
+        "task_id": "calculator-add-floats",
+        "model": "qwen3.6-plus",
+        "finished_at": "2026-11-05T06:55:03.699315+00:00",
+        "category": "success",
+        "completed": true,
+        "tests_passed": true,
+        "diff_chars": 263,
+        "test_runs": 1,
+        "event_count": 0
+      },
+      "latest_valid_attempt": {
+        "run_id": "20261105T065422Z-83adadc7",
+        "task_id": "calculator-add-floats",
+        "model": "qwen3.6-plus",
+        "finished_at": "2026-11-05T06:55:03.699315+00:00",
+        "category": "success",
+        "completed": true,
+        "tests_passed": true,
+        "diff_chars": 263,
+        "test_runs": 1,
+        "event_count": 0
+      }
+    },
+    "calculator-add-negative-mixed": {
+      "attempt_count": 3,
+      "latest_attempt": {
+        "run_id": "20261105T073653Z-743842e9",
+        "task_id": "calculator-add-negative-mixed",
+        "model": "deepseek-flash",
+        "finished_at": "2026-11-05T07:37:02.185320+00:00",
+        "category": "success",
+        "completed": true,
+        "tests_passed": true,
+        "diff_chars": 277,
+        "test_runs": 1,
+        "event_count": 7
+      },
+      "latest_valid_attempt": {
+        "run_id": "20261105T073653Z-743842e9",
+        "task_id": "calculator-add-negative-mixed",
+        "model": "deepseek-flash",
+        "finished_at": "2026-11-05T07:37:02.185320+00:00",
+        "category": "success",
+        "completed": true,
+        "tests_passed": true,
+        "diff_chars": 277,
+        "test_runs": 1,
+        "event_count": 7
+      }
+    },
+    "calculator-add-rejects-text": {
+      "attempt_count": 1,
+      "latest_attempt": {
+        "run_id": "20261105T074423Z-4ae90f63",
+        "task_id": "calculator-add-rejects-text",
+        "model": "deepseek-flash",
+        "finished_at": "2026-11-05T07:44:33.308145+00:00",
+        "category": "success",
+        "completed": true,
+        "tests_passed": true,
+        "diff_chars": 702,
+        "test_runs": 1,
+        "event_count": 7
+      },
+      "latest_valid_attempt": {
+        "run_id": "20261105T074423Z-4ae90f63",
+        "task_id": "calculator-add-rejects-text",
+        "model": "deepseek-flash",
+        "finished_at": "2026-11-05T07:44:33.308145+00:00",
+        "category": "success",
+        "completed": true,
+        "tests_passed": true,
+        "diff_chars": 702,
+        "test_runs": 1,
+        "event_count": 7
+      }
+    },
+    "calculator-divide-fraction": {
+      "attempt_count": 1,
+      "latest_attempt": {
+        "run_id": "20261105T070349Z-ee213abe",
+        "task_id": "calculator-divide-fraction",
+        "model": "qwen3.6-plus",
+        "finished_at": "2026-11-05T07:04:17.032784+00:00",
+        "category": "success",
+        "completed": true,
+        "tests_passed": true,
+        "diff_chars": 271,
+        "test_runs": 1,
+        "event_count": 0
+      },
+      "latest_valid_attempt": {
+        "run_id": "20261105T070349Z-ee213abe",
+        "task_id": "calculator-divide-fraction",
+        "model": "qwen3.6-plus",
+        "finished_at": "2026-11-05T07:04:17.032784+00:00",
+        "category": "success",
+        "completed": true,
+        "tests_passed": true,
+        "diff_chars": 271,
+        "test_runs": 1,
+        "event_count": 0
+      }
+    },
+    "calculator-divide-negative": {
+      "attempt_count": 1,
+      "latest_attempt": {
+        "run_id": "20261105T074257Z-9fa846bd",
+        "task_id": "calculator-divide-negative",
+        "model": "deepseek-flash",
+        "finished_at": "2026-11-05T07:43:06.538712+00:00",
+        "category": "success",
+        "completed": true,
+        "tests_passed": true,
+        "diff_chars": 338,
+        "test_runs": 1,
+        "event_count": 7
+      },
+      "latest_valid_attempt": {
+        "run_id": "20261105T074257Z-9fa846bd",
+        "task_id": "calculator-divide-negative",
+        "model": "deepseek-flash",
+        "finished_at": "2026-11-05T07:43:06.538712+00:00",
+        "category": "success",
+        "completed": true,
+        "tests_passed": true,
+        "diff_chars": 338,
+        "test_runs": 1,
+        "event_count": 7
+      }
+    },
+    "calculator-divide-zero-numerator": {
+      "attempt_count": 1,
+      "latest_attempt": {
+        "run_id": "20261105T074341Z-d434b73d",
+        "task_id": "calculator-divide-zero-numerator",
+        "model": "deepseek-flash",
+        "finished_at": "2026-11-05T07:43:50.238412+00:00",
+        "category": "success",
+        "completed": true,
+        "tests_passed": true,
+        "diff_chars": 319,
+        "test_runs": 1,
+        "event_count": 7
+      },
+      "latest_valid_attempt": {
+        "run_id": "20261105T074341Z-d434b73d",
+        "task_id": "calculator-divide-zero-numerator",
+        "model": "deepseek-flash",
+        "finished_at": "2026-11-05T07:43:50.238412+00:00",
+        "category": "success",
+        "completed": true,
+        "tests_passed": true,
+        "diff_chars": 319,
+        "test_runs": 1,
+        "event_count": 7
+      }
+    },
+    "calculator-multiply": {
+      "attempt_count": 1,
+      "latest_attempt": {
+        "run_id": "20261105T074508Z-b3f2e6e6",
+        "task_id": "calculator-multiply",
+        "model": "deepseek-flash",
+        "finished_at": "2026-11-05T07:45:20.000508+00:00",
+        "category": "success",
+        "completed": true,
+        "tests_passed": true,
+        "diff_chars": 773,
+        "test_runs": 1,
+        "event_count": 7
+      },
+      "latest_valid_attempt": {
+        "run_id": "20261105T074508Z-b3f2e6e6",
+        "task_id": "calculator-multiply",
+        "model": "deepseek-flash",
+        "finished_at": "2026-11-05T07:45:20.000508+00:00",
+        "category": "success",
+        "completed": true,
+        "tests_passed": true,
+        "diff_chars": 773,
+        "test_runs": 1,
+        "event_count": 7
+      }
+    },
+    "calculator-subtract-floats": {
+      "attempt_count": 1,
+      "latest_attempt": {
+        "run_id": "20261105T074214Z-98aa7c64",
+        "task_id": "calculator-subtract-floats",
+        "model": "deepseek-flash",
+        "finished_at": "2026-11-05T07:42:24.572332+00:00",
+        "category": "success",
+        "completed": true,
+        "tests_passed": true,
+        "diff_chars": 285,
+        "test_runs": 1,
+        "event_count": 7
+      },
+      "latest_valid_attempt": {
+        "run_id": "20261105T074214Z-98aa7c64",
+        "task_id": "calculator-subtract-floats",
+        "model": "deepseek-flash",
+        "finished_at": "2026-11-05T07:42:24.572332+00:00",
+        "category": "success",
+        "completed": true,
+        "tests_passed": true,
+        "diff_chars": 285,
+        "test_runs": 1,
+        "event_count": 7
+      }
+    },
+    "calculator-subtract-negative": {
+      "attempt_count": 1,
+      "latest_attempt": {
+        "run_id": "20261105T070213Z-d1386853",
+        "task_id": "calculator-subtract-negative",
+        "model": "qwen3.6-plus",
+        "finished_at": "2026-11-05T07:02:57.682989+00:00",
+        "category": "success",
+        "completed": true,
+        "tests_passed": true,
+        "diff_chars": 266,
+        "test_runs": 1,
+        "event_count": 0
+      },
+      "latest_valid_attempt": {
+        "run_id": "20261105T070213Z-d1386853",
+        "task_id": "calculator-subtract-negative",
+        "model": "qwen3.6-plus",
+        "finished_at": "2026-11-05T07:02:57.682989+00:00",
+        "category": "success",
+        "completed": true,
+        "tests_passed": true,
+        "diff_chars": 266,
+        "test_runs": 1,
+        "event_count": 0
+      }
+    },
+    "calculator-subtract-zero": {
+      "attempt_count": 2,
+      "latest_attempt": {
+        "run_id": "20261105T100945Z-03bbad3f",
+        "task_id": "calculator-subtract-zero",
+        "model": "deepseek-flash",
+        "finished_at": "2026-11-05T10:09:56.403715+00:00",
+        "category": "success",
+        "completed": true,
+        "tests_passed": true,
+        "diff_chars": 276,
+        "test_runs": 1,
+        "event_count": 13
+      },
+      "latest_valid_attempt": {
+        "run_id": "20261105T100945Z-03bbad3f",
+        "task_id": "calculator-subtract-zero",
+        "model": "deepseek-flash",
+        "finished_at": "2026-11-05T10:09:56.403715+00:00",
+        "category": "success",
+        "completed": true,
+        "tests_passed": true,
+        "diff_chars": 276,
+        "test_runs": 1,
+        "event_count": 13
+      }
+    }
+  }
+}
