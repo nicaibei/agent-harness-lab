@@ -7,7 +7,7 @@ from typing import Any
 
 from langchain_core.messages import ToolMessage
 
-from harness.policy import PolicyMiddleware
+from harness.policy import PolicyMiddleware, classify_command
 
 
 def _request(name: str, args: dict[str, Any]) -> SimpleNamespace:
@@ -68,3 +68,28 @@ def test_denies_unknown_tool_and_budget_exhaustion() -> None:
     assert "allowlisted" in str(unknown.content)
     assert isinstance(over_budget, ToolMessage) and over_budget.status == "error"
     assert "budget" in str(over_budget.content)
+
+
+def test_classifies_commands_by_execution_risk() -> None:
+    assert classify_command("python -m pytest -q") == "safe"
+    assert classify_command("pip install requests") == "review"
+    assert classify_command("rm -rf workspace") == "dangerous"
+
+
+def test_requires_and_records_approval_for_review_commands() -> None:
+    approvals: list[dict[str, Any]] = []
+    decisions: list[dict[str, Any]] = []
+    policy = PolicyMiddleware(
+        on_decision=decisions.append,
+        approval_callback=lambda request: approvals.append(request) or True,
+    )
+
+    result = policy.wrap_tool_call(
+        _request("run_command", {"command": "pip install requests"}),
+        _handler,
+    )
+
+    assert isinstance(result, ToolMessage)
+    assert result.content == "executed"
+    assert approvals[0]["risk"] == "review"
+    assert decisions[-1]["reason"] == "command approved"

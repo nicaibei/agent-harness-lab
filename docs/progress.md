@@ -15,9 +15,10 @@
 - Implemented Policy Middleware v1 for tool allowlists, path traversal and sensitive-file rejection, delete blocking, and call budgets.
 - Added policy unit tests and completed one DeepSeek regression run with policy decision events.
 - Added offline Agent-graph integration tests for path traversal, sensitive files, delete, and tool-budget denial.
+- Added Policy v2 command risk classification and an approval callback contract, with offline graph integration tests.
 
 ## Next
 
-- Extend Policy Middleware experiments for command risk, approvals, and budgets.
 - Preserve the 10-task Baseline matrix as the comparison set for the first enhanced Harness version.
 - Add structured setup-error reporting before testing recovery and replay behavior.
+- Begin Recovery Middleware experiments with injected test and tool failures.
