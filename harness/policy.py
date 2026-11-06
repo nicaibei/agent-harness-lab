@@ -72,6 +72,7 @@ class PolicyMiddleware(AgentMiddleware):
         allowed_tools: frozenset[str] = DEFAULT_ALLOWED_TOOLS,
         on_decision: Callable[[dict[str, Any]], None] | None = None,
         approval_callback: Callable[[dict[str, Any]], bool] | None = None,
+        require_baseline_test: bool = False,
     ) -> None:
         if max_tool_calls < 1:
             raise ValueError("max_tool_calls must be at least 1")
@@ -79,6 +80,8 @@ class PolicyMiddleware(AgentMiddleware):
         self.allowed_tools = allowed_tools
         self.on_decision = on_decision
         self.approval_callback = approval_callback
+        self.require_baseline_test = require_baseline_test
+        self.baseline_test_completed = False
         self.call_count = 0
 
     def _emit(
@@ -151,6 +154,12 @@ class PolicyMiddleware(AgentMiddleware):
         self.call_count += 1
         if tool_name not in self.allowed_tools:
             return self._deny(request, f"tool {tool_name!r} is not allowlisted", call_index)
+        if (
+            self.require_baseline_test
+            and tool_name in MUTATING_TOOLS
+            and not self.baseline_test_completed
+        ):
+            return self._deny(request, "baseline test must run before file mutations", call_index)
         if tool_name in COMMAND_TOOLS:
             command = tool_call.get("args", {}).get("command")
             risk = classify_command(command)
@@ -172,5 +181,10 @@ class PolicyMiddleware(AgentMiddleware):
         reason = self._path_reason(tool_name, tool_call.get("args", {})) if tool_name in PATH_TOOLS else None
         if reason is not None:
             return self._deny(request, reason, call_index)
+        if tool_name == "run_tests" and self.require_baseline_test:
+            result = handler(request)
+            self.baseline_test_completed = True
+            self._emit("allow", tool_name, "baseline test completed", call_index)
+            return result
         self._emit("allow", tool_name, "policy checks passed", call_index)
         return handler(request)

@@ -22,6 +22,8 @@
 - Added Checkpoint/Replay v1 with LangGraph `InMemorySaver`, tool-boundary interruption and resume, checkpoint artifacts, and side-effect-free event replay.
 - Added an offline evaluation report that separates model/setup failures from Agent task outcomes and keeps latest-valid per-task summaries.
 - Added deterministic fault-injection cases for transient retry, changed tool arguments, and test failure followed by a file-changing fix.
+- Added a real DeepSeek hidden-evaluator recovery fixture, an enforced baseline-test gate, and a second-run success trace after an initial hidden-test failure.
+- Fixed Recovery classification for raw JSON string tool results and immediate hidden-test event recording.
 
 ## Next
 
@@ -30,3 +32,4 @@
 - Compare Baseline, Policy, Recovery, and Checkpoint/Replay metrics on the preserved 10-task matrix.
 - Add controlled fault-injection tasks that produce test failures and parameter errors for Recovery evaluation.
 - Add negative fault-injection cases where the model changes its action but still fails, and compare failure traces across Harness versions.
+- Add two more real hidden-evaluator tasks and compare prompt-only ordering with the Harness-enforced baseline-test gate.

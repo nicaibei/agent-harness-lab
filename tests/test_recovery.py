@@ -29,6 +29,7 @@ def test_classifies_transient_and_terminal_failures() -> None:
             tool_call_id="call-1",
         )
     ) == "tool_error"
+    assert classify_failure('{"success": false, "exit_code": 1}') == "tool_error"
 
 
 def test_retries_transient_exception_once() -> None:

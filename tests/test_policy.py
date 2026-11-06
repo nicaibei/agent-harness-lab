@@ -93,3 +93,23 @@ def test_requires_and_records_approval_for_review_commands() -> None:
     assert result.content == "executed"
     assert approvals[0]["risk"] == "review"
     assert decisions[-1]["reason"] == "command approved"
+
+
+def test_baseline_test_gate_blocks_mutations_until_tests_run() -> None:
+    policy = PolicyMiddleware(require_baseline_test=True)
+
+    blocked = policy.wrap_tool_call(
+        _request("edit_file", {"file_path": "/calculator.py", "old_string": "x", "new_string": "y"}),
+        _handler,
+    )
+    baseline = policy.wrap_tool_call(_request("run_tests", {}), _handler)
+    allowed = policy.wrap_tool_call(
+        _request("edit_file", {"file_path": "/calculator.py", "old_string": "x", "new_string": "y"}),
+        _handler,
+    )
+
+    assert isinstance(blocked, ToolMessage) and blocked.status == "error"
+    assert "baseline test" in str(blocked.content)
+    assert isinstance(baseline, ToolMessage)
+    assert isinstance(allowed, ToolMessage)
+    assert allowed.content == "executed"

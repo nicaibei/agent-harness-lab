@@ -1,0 +1,115 @@
+"""Offline checks for the hidden evaluator used by the real recovery run."""
+
+from __future__ import annotations
+
+from pathlib import Path
+import json
+from typing import Any
+
+from deepagents import create_deep_agent
+from deepagents.backends import FilesystemBackend
+from langchain_core.language_models.fake_chat_models import FakeMessagesListChatModel
+from langchain_core.messages import AIMessage, ToolMessage
+from langgraph.checkpoint.memory import InMemorySaver
+
+from evals.real_recovery import HIDDEN_TESTS, RECOVERY_PROJECT, _run_hidden_tests
+from evals.real_recovery import _create_hidden_test_tool
+from harness.policy import PolicyMiddleware
+from harness.recovery import RecoveryMiddleware
+
+
+class BoundFakeChatModel(FakeMessagesListChatModel):
+    """Offline model that accepts the tool binding used by create_deep_agent."""
+
+    def bind_tools(self, tools: Any, **kwargs: Any) -> BoundFakeChatModel:
+        return self
+
+
+def test_hidden_evaluator_fails_before_and_passes_after_real_code_fix(tmp_path: Path) -> None:
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    source = RECOVERY_PROJECT / "title_utils.py"
+    (workspace / "title_utils.py").write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
+
+    before = _run_hidden_tests(workspace, HIDDEN_TESTS)
+    assert before["success"] is False
+
+    (workspace / "title_utils.py").write_text(
+        "import re\n\n\ndef normalize_title(value: str) -> str:\n"
+        "    return re.sub(r\"\\s+\", \"-\", value.strip().lower())\n",
+        encoding="utf-8",
+    )
+    after = _run_hidden_tests(workspace, HIDDEN_TESTS)
+
+    assert after["success"] is True
+
+
+def test_baseline_gate_forces_hidden_failure_before_real_fix(tmp_path: Path) -> None:
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    source = RECOVERY_PROJECT / "title_utils.py"
+    (workspace / "title_utils.py").write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
+    events: list[dict[str, Any]] = []
+    fixed_code = (
+        "import re\n\n\ndef normalize_title(value: str) -> str:\n"
+        "    return re.sub(r\"\\s+\", \"-\", value.strip().lower())\n"
+    )
+    agent = create_deep_agent(
+        model=BoundFakeChatModel(
+            responses=[
+                AIMessage(
+                    content="",
+                    tool_calls=[
+                        {
+                            "name": "write_file",
+                            "args": {"file_path": "/title_utils.py", "content": fixed_code},
+                            "id": "premature-edit",
+                        }
+                    ],
+                ),
+                AIMessage(
+                    content="",
+                    tool_calls=[{"name": "run_tests", "args": {}, "id": "baseline-test"}],
+                ),
+                AIMessage(
+                    content="",
+                    tool_calls=[
+                        {
+                            "name": "write_file",
+                            "args": {"file_path": "/title_utils.py", "content": fixed_code},
+                            "id": "approved-edit",
+                        }
+                    ],
+                ),
+                AIMessage(
+                    content="",
+                    tool_calls=[{"name": "run_tests", "args": {}, "id": "final-test"}],
+                ),
+                AIMessage(content="finished"),
+            ]
+        ),
+        backend=FilesystemBackend(root_dir=workspace, virtual_mode=True),
+        tools=[_create_hidden_test_tool(workspace, HIDDEN_TESTS)],
+        middleware=[
+            PolicyMiddleware(require_baseline_test=True, on_decision=events.append),
+            RecoveryMiddleware(on_event=events.append),
+        ],
+        checkpointer=InMemorySaver(),
+    )
+
+    result = agent.invoke(
+        {"messages": [("user", "repair the title normalizer")]},
+        config={"configurable": {"thread_id": "offline-recovery"}},
+    )
+    tool_results = [message for message in result["messages"] if isinstance(message, ToolMessage)]
+    test_results = [
+        json.loads(message.content)
+        for message in tool_results
+        if message.name == "run_tests"
+    ]
+
+    assert tool_results[0].status == "error"
+    assert "baseline test" in str(tool_results[0].content)
+    assert [item["success"] for item in test_results] == [False, True]
+    assert (workspace / "title_utils.py").read_text(encoding="utf-8") == fixed_code
+    assert any(event.get("decision") == "deny" for event in events)

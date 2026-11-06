@@ -18,6 +18,17 @@ _TRANSIENT_MARKERS = ("timeout", "timed out", "temporarily", "connection reset",
 
 def classify_failure(value: object) -> FailureCategory | None:
     """Classify a tool exception or error message for recovery decisions."""
+    if isinstance(value, str):
+        text = value[:500].casefold()
+        if any(marker in text for marker in _TRANSIENT_MARKERS):
+            return "transient"
+        try:
+            payload = json.loads(text)
+        except json.JSONDecodeError:
+            payload = None
+        if isinstance(payload, dict) and payload.get("success") is False:
+            return "tool_error"
+        return None
     if isinstance(value, ToolMessage):
         text = _message_text(value.content).casefold()
         if "policy denied" in text:

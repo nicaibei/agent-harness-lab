@@ -338,7 +338,21 @@ Checkpoint v1 先使用 `InMemorySaver` 证明机制，不立即增加 SQLite �
 
 ## 下一阶段：真实任务中的纠错对比
 
-负面故障注入已经证明评测器能区分“采取过修复动作”和“最终修复成功”。下一步可以把同样的指标应用到真实 DeepSeek 任务，比较 Baseline、Recovery 和完整 Harness 在测试失败后的恢复率。
+负面故障注入和一个真实隐藏评测已经证明评测器能区分“采取过修复动作”和“最终修复成功”。下一步可以增加两个真实隐藏评测任务，比较 Baseline、Recovery 和完整 Harness 在测试失败后的恢复率。
+
+## 阶段 7：真实 DeepSeek 隐藏评测与基线测试门 v1
+
+### 目标和设计判断
+
+第一次真实运行中，DeepSeek 在测试前就修复了代码，因此只证明了隐藏测试有效，没有证明失败后的纠错。为保证实验顺序，Policy 增加了可选的 `require_baseline_test`：第一次隐藏测试完成前，文件修改工具会被拒绝。
+
+### 实现和证据
+
+隐藏测试位于 workspace 外，Agent 只能看到 `run_tests` 的输出。第二次真实运行先产生一次 Policy 拒绝，然后第一次隐藏测试返回 `2 failed`，模型修改 `title_utils.py`，第二次测试返回 `2 passed`，最终 `completed=true`、`tests_passed=true`。
+
+这是真实纠错的最小证据链。实验还暴露了原始 JSON 工具结果的 Recovery 分类缺陷，已经补充字符串 JSON 分类和即时测试事件记录；历史运行不回写。
+
+本阶段全量测试结果为 `37 passed`。实验报告见 [real-recovery-v1.md](real-recovery-v1.md)。
 
 ## 学习和工程纪律
 

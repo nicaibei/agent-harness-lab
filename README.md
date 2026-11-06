@@ -23,6 +23,7 @@ Issue
 - [x] Checkpoint/Replay v1（内存 checkpoint、工具边界恢复、事件 replay）
 - [x] 离线评测与失败分类 v1
 - [x] 故障注入与 Recovery 纠错评测 v1
+- [x] 真实 DeepSeek 隐藏评测与基线测试门 v1
 - [ ] 任务评测集和对比实验
 
 ## 目录结构
