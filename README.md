@@ -18,8 +18,8 @@ Issue
 
 - [x] Backend CRUD、路径映射和 CompositeBackend 路由实验
 - [x] 最小 Issue-to-PR Baseline（10 个任务已完成）
-- [x] Policy Middleware v1
-- [ ] Recovery Middleware
+- [x] Policy Middleware v1/v2
+- [x] Recovery Middleware v1
 - [ ] Checkpoint 和 Replay
 - [ ] 任务评测集和对比实验
 
@@ -81,7 +81,7 @@ uv run agent-harness --task-id calculator-add-floats
 
 Agent 会把 toy 项目复制到 runs/<run-id>/workspace/，在副本中工作。它只能使用 Deep Agents 文件工具和固定的 pytest 工具，不接收任意 shell 命令。每次运行生成 diff.patch 和 run.json。
 
-Baseline 运行现在还接入了第一版 Policy Middleware：工具调用必须通过 allowlist，文件路径拒绝路径穿越和敏感文件，删除与未知工具默认拒绝，单次运行最多允许 30 次工具调用。每次策略允许或拒绝都会写入 `run.json.events`。这属于工具调用级保护，不等同于操作系统沙箱。
+Baseline 运行现在接入了 Policy 和 Recovery Middleware：工具调用必须通过 allowlist，文件路径拒绝路径穿越和敏感文件，删除与未知工具默认拒绝，单次运行最多允许 30 次工具调用；暂时性工具错误会有限重试，参数错误和测试失败会交回 Agent，重复调用会被阻断。策略和恢复事件都会写入 `run.json.events`。这些机制属于工具调用级保护和恢复控制，不等同于操作系统沙箱。
 
 默认任务项目位于 examples/tiny_python_project/。10 条可重复任务定义在 evals/tasks.json。本机无 API Key 时仍可运行离线测试：
 

@@ -22,6 +22,7 @@ from langchain_core.messages import HumanMessage, ToolMessage
 from langchain_core.tools import BaseTool, tool
 
 from harness.policy import PolicyMiddleware
+from harness.recovery import RecoveryMiddleware
 
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
@@ -197,10 +198,16 @@ def run_task(issue: str, project: Path, *, task_id: str | None = None) -> Path:
         file_count=len(before),
     )
     test_tool = _create_test_tool(workspace)
+    def record_recovery_event(recovery_event: dict[str, Any]) -> None:
+        event_name = recovery_event.get("event", "recovery_event")
+        details = {key: value for key, value in recovery_event.items() if key != "event"}
+        _record_event(events, event_name, **details)
+
     policy = PolicyMiddleware(
         max_tool_calls=30,
         on_decision=lambda decision: _record_event(events, "policy_decision", **decision),
     )
+    recovery = RecoveryMiddleware(on_event=record_recovery_event)
     agent = create_deep_agent(
         model=ChatOpenAI(
             model=model_name,
@@ -209,7 +216,7 @@ def run_task(issue: str, project: Path, *, task_id: str | None = None) -> Path:
         ),
         backend=FilesystemBackend(root_dir=workspace, virtual_mode=True),
         tools=[test_tool],
-        middleware=[policy],
+        middleware=[policy, recovery],
         system_prompt=(
             "You are a careful coding agent working in a disposable copy of a "
             "small Python project. Use filesystem tools to inspect and edit files. "

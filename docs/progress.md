@@ -16,9 +16,12 @@
 - Added policy unit tests and completed one DeepSeek regression run with policy decision events.
 - Added offline Agent-graph integration tests for path traversal, sensitive files, delete, and tool-budget denial.
 - Added Policy v2 command risk classification and an approval callback contract, with offline graph integration tests.
+- Implemented Recovery Middleware v1 for transient retries, terminal-error classification, and repeated-call detection.
+- Added Agent-graph integration coverage for a timeout followed by a successful retry.
+- Added model-facing recovery tests for corrected tool arguments and injected test failures.
 
 ## Next
 
 - Preserve the 10-task Baseline matrix as the comparison set for the first enhanced Harness version.
-- Add structured setup-error reporting before testing recovery and replay behavior.
-- Begin Recovery Middleware experiments with injected test and tool failures.
+- Add structured setup-error reporting before testing checkpoint and replay behavior.
+- Add injected test-failure recovery for the Baseline `run_tests` tool.
