@@ -21,6 +21,7 @@ DEFAULT_ALLOWED_TOOLS = frozenset(
         "edit_file",
         "glob",
         "grep",
+        "delete",
         "run_tests",
         "write_todos",
     }

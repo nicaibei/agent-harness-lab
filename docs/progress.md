@@ -14,6 +14,7 @@
 - Added timestamped lifecycle events to new `run.json` artifacts and validated them on seven DeepSeek runs.
 - Implemented Policy Middleware v1 for tool allowlists, path traversal and sensitive-file rejection, delete blocking, and call budgets.
 - Added policy unit tests and completed one DeepSeek regression run with policy decision events.
+- Added offline Agent-graph integration tests for path traversal, sensitive files, delete, and tool-budget denial.
 
 ## Next
 

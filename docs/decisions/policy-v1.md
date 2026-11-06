@@ -19,4 +19,4 @@ Policy v1 约束 Agent 工具调用，不提供操作系统级沙箱。`Filesyst
 
 ## 验证
 
-`tests/test_policy.py` 覆盖：正常读取、路径穿越、敏感文件、删除、未知工具和预算耗尽。Baseline 任务回归还需确认策略不会阻断 Deep Agents 的正常文件工具调用。
+`tests/test_policy.py` 覆盖策略对象的正常读取、路径穿越、敏感文件、删除、未知工具和预算耗尽；`tests/test_policy_integration.py` 使用离线假模型和真实 `create_deep_agent` 图，验证危险工具调用在执行边界被拦截，工作区不发生未授权变化。Baseline 任务回归还需确认策略不会阻断 Deep Agents 的正常文件工具调用。
