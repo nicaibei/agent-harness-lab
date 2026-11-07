@@ -9,9 +9,10 @@ import shutil
 import subprocess
 import sys
 import uuid
+from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 from dotenv import load_dotenv
 from deepagents import create_deep_agent
@@ -36,11 +37,60 @@ from harness.recovery import RecoveryMiddleware
 
 RECOVERY_PROJECT = REPOSITORY_ROOT / "examples" / "recovery_python_project"
 HIDDEN_TESTS = REPOSITORY_ROOT / "evals" / "hidden_tests" / "test_title_utils.py"
+TAX_PROJECT = REPOSITORY_ROOT / "examples" / "recovery_tax_project"
+TAX_HIDDEN_TESTS = REPOSITORY_ROOT / "evals" / "hidden_tests" / "test_tax.py"
+PERCENT_PROJECT = REPOSITORY_ROOT / "examples" / "recovery_percent_project"
+PERCENT_HIDDEN_TESTS = REPOSITORY_ROOT / "evals" / "hidden_tests" / "test_percent.py"
 RECOVERY_RUNS_ROOT = REPOSITORY_ROOT / "runs" / "recovery"
 API_KEY_ENV = "DEEPSEEK_API_KEY"
 MODEL_ENV = "DEEPSEEK_MODEL"
 BASE_URL_ENV = "DEEPSEEK_BASE_URL"
 DEFAULT_BASE_URL = "https://api.deepseek.com"
+
+
+@dataclass(frozen=True)
+class RecoveryCase:
+    """One hidden-evaluator task used by the real-model matrix."""
+
+    task_id: str
+    project: Path
+    hidden_tests: Path
+    issue: str
+
+
+RECOVERY_CASES = {
+    "normalize-title": RecoveryCase(
+        task_id="real-recovery-normalize-title",
+        project=RECOVERY_PROJECT,
+        hidden_tests=HIDDEN_TESTS,
+        issue=(
+            "The title normalizer must trim outer whitespace, lowercase the text, "
+            "collapse one or more internal whitespace characters into a single "
+            "hyphen, and preserve the existing public function name."
+        ),
+    ),
+    "fractional-tax": RecoveryCase(
+        task_id="real-recovery-fractional-tax",
+        project=TAX_PROJECT,
+        hidden_tests=TAX_HIDDEN_TESTS,
+        issue=(
+            "Fix total_with_tax so tax_rate is treated as a fractional rate of "
+            "amount. For example, total_with_tax(100, 0.2) must return 120, "
+            "while a zero rate leaves the amount unchanged."
+        ),
+    ),
+    "parse-percent": RecoveryCase(
+        task_id="real-recovery-parse-percent",
+        project=PERCENT_PROJECT,
+        hidden_tests=PERCENT_HIDDEN_TESTS,
+        issue=(
+            "Fix parse_percent so a string with a percent suffix is converted to "
+            "a fractional value, while a decimal fraction stays unchanged. "
+            "For example, parse_percent('20%') must return 0.2 and "
+            "parse_percent('0.5') must return 0.5."
+        ),
+    ),
+}
 
 
 def _run_hidden_tests(workspace: Path, hidden_tests: Path) -> dict[str, object]:
@@ -75,7 +125,7 @@ def _run_hidden_tests(workspace: Path, hidden_tests: Path) -> dict[str, object]:
 def _create_hidden_test_tool(
     workspace: Path,
     hidden_tests: Path,
-    on_result: Any | None = None,
+    on_result: Callable[[int, dict[str, object]], None] | None = None,
 ) -> BaseTool:
     """Create a bounded tool whose evaluator stays outside the workspace."""
     remaining_runs = 2
@@ -104,20 +154,23 @@ def _create_hidden_test_tool(
     return run_tests
 
 
-def _task_prompt() -> str:
+def _task_prompt(case: RecoveryCase) -> str:
     """Build the real recovery task prompt."""
     return (
-        "Fix the coding issue in the provided Python project. The title normalizer must "
-        "trim outer whitespace, lowercase the text, collapse one or more internal "
-        "whitespace characters into a single hyphen, and preserve the existing public "
-        "function name. Inspect the implementation before editing. Use the provided "
+        "Fix the coding issue in the provided Python project. "
+        f"Issue: {case.issue}\n\n"
+        "Inspect the implementation before editing. Use the provided "
         "run_tests tool to validate the change. If the first test run fails, inspect "
         "the failure output, make one focused repair, and run the tests again. Do not "
         "modify tests or claim success unless the test tool confirms it."
     )
 
 
-def run_recovery_task() -> Path:
+def run_recovery_task(
+    case_name: str = "normalize-title",
+    *,
+    baseline_gate: bool = True,
+) -> Path:
     """Run the hidden-test recovery experiment and save its artifacts."""
     load_dotenv(REPOSITORY_ROOT / ".env")
     api_key = os.environ.get(API_KEY_ENV)
@@ -126,14 +179,18 @@ def run_recovery_task() -> Path:
         raise RuntimeError(f"Set the {API_KEY_ENV} environment variable before running the recovery task.")
     if not model_name:
         raise RuntimeError(f"Set the {MODEL_ENV} environment variable before running the recovery task.")
-    source = RECOVERY_PROJECT.resolve(strict=True)
-    hidden_tests = HIDDEN_TESTS.resolve(strict=True)
+    case = RECOVERY_CASES.get(case_name)
+    if case is None:
+        raise ValueError(f"Unknown recovery case: {case_name}")
+    source = case.project.resolve(strict=True)
+    hidden_tests = case.hidden_tests.resolve(strict=True)
+    started_at = datetime.now(UTC).isoformat()
     run_id = f"{datetime.now(UTC):%Y%m%dT%H%M%SZ}-{uuid.uuid4().hex[:8]}"
     run_dir = RECOVERY_RUNS_ROOT / run_id
     workspace = run_dir / "workspace"
     workspace.parent.mkdir(parents=True, exist_ok=False)
     events: list[dict[str, Any]] = []
-    _record_event(events, "run_started", run_id=run_id, task_id="real-recovery-normalize-title")
+    _record_event(events, "run_started", run_id=run_id, task_id=case.task_id)
     shutil.copytree(source, workspace, ignore=COPY_IGNORE)
     before = _snapshot_files(workspace)
     _record_event(events, "workspace_created", workspace=str(workspace), file_count=len(before))
@@ -145,7 +202,7 @@ def run_recovery_task() -> Path:
 
     policy = PolicyMiddleware(
         max_tool_calls=30,
-        require_baseline_test=True,
+        require_baseline_test=baseline_gate,
         on_decision=lambda decision: _record_event(events, "policy_decision", **decision),
     )
     recovery = RecoveryMiddleware(on_event=record_recovery_event)
@@ -174,7 +231,7 @@ def run_recovery_task() -> Path:
     _record_event(events, "agent_started", model=model_name, base_url=base_url)
     execution_error = None
     try:
-        response = agent.invoke({"messages": [HumanMessage(content=_task_prompt())]}, config=run_config)
+        response = agent.invoke({"messages": [HumanMessage(content=_task_prompt(case))]}, config=run_config)
     except Exception as error:  # noqa: BLE001 - retain the real experiment trace
         response = {}
         execution_error = f"{type(error).__name__}: {error}"
@@ -204,9 +261,10 @@ def run_recovery_task() -> Path:
     _record_event(events, "run_finished", completed=completed, tests_passed=tests_passed)
     report = {
         "run_id": run_id,
-        "task_id": "real-recovery-normalize-title",
+        "task_id": case.task_id,
         "scenario": "real-model-hidden-evaluator",
-        "started_at": datetime.now(UTC).isoformat(),
+        "baseline_gate": baseline_gate,
+        "started_at": started_at,
         "finished_at": datetime.now(UTC).isoformat(),
         "model": model_name,
         "base_url": base_url,
@@ -231,9 +289,15 @@ def run_recovery_task() -> Path:
 def main() -> None:
     """Run the real recovery experiment from the command line."""
     parser = argparse.ArgumentParser(description="Run the hidden-test DeepSeek recovery experiment.")
-    parser.parse_args()
+    parser.add_argument("--case", choices=sorted(RECOVERY_CASES), default="normalize-title")
+    parser.add_argument(
+        "--no-baseline-gate",
+        action="store_true",
+        help="Allow file mutations before the first hidden test for the ablation experiment.",
+    )
+    args = parser.parse_args()
     try:
-        run_dir = run_recovery_task()
+        run_dir = run_recovery_task(args.case, baseline_gate=not args.no_baseline_gate)
     except (OSError, RuntimeError, ValueError) as error:
         parser.error(str(error))
     print(f"Run artifacts: {run_dir}")

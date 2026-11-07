@@ -6,13 +6,19 @@ from pathlib import Path
 import json
 from typing import Any
 
+import pytest
 from deepagents import create_deep_agent
 from deepagents.backends import FilesystemBackend
 from langchain_core.language_models.fake_chat_models import FakeMessagesListChatModel
 from langchain_core.messages import AIMessage, ToolMessage
 from langgraph.checkpoint.memory import InMemorySaver
 
-from evals.real_recovery import HIDDEN_TESTS, RECOVERY_PROJECT, _run_hidden_tests
+from evals.real_recovery import (
+    HIDDEN_TESTS,
+    RECOVERY_CASES,
+    RECOVERY_PROJECT,
+    _run_hidden_tests,
+)
 from evals.real_recovery import _create_hidden_test_tool
 from harness.policy import PolicyMiddleware
 from harness.recovery import RecoveryMiddleware
@@ -42,6 +48,49 @@ def test_hidden_evaluator_fails_before_and_passes_after_real_code_fix(tmp_path: 
     after = _run_hidden_tests(workspace, HIDDEN_TESTS)
 
     assert after["success"] is True
+
+
+@pytest.mark.parametrize(
+    ("case_name", "filename", "fixed_code"),
+    [
+        (
+            "fractional-tax",
+            "tax.py",
+            "\n\ndef total_with_tax(amount: float, tax_rate: float) -> float:\n"
+            "    return amount + amount * tax_rate\n",
+        ),
+        (
+            "parse-percent",
+            "percent.py",
+            "\n\ndef parse_percent(value: str) -> float:\n"
+            "    text = value.strip()\n"
+            "    return float(text[:-1]) / 100 if text.endswith(\"%\") else float(text)\n",
+        ),
+    ],
+)
+def test_additional_hidden_evaluators_fail_then_pass(
+    tmp_path: Path,
+    case_name: str,
+    filename: str,
+    fixed_code: str,
+) -> None:
+    case = RECOVERY_CASES[case_name]
+    workspace = tmp_path / case_name
+    workspace.mkdir()
+    source = case.project / filename
+    (workspace / filename).write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
+
+    assert _run_hidden_tests(workspace, case.hidden_tests)["success"] is False
+    (workspace / filename).write_text(fixed_code, encoding="utf-8")
+    assert _run_hidden_tests(workspace, case.hidden_tests)["success"] is True
+
+
+def test_recovery_task_defaults_to_baseline_gate() -> None:
+    from inspect import signature
+
+    from evals.real_recovery import run_recovery_task
+
+    assert signature(run_recovery_task).parameters["baseline_gate"].default is True
 
 
 def test_baseline_gate_forces_hidden_failure_before_real_fix(tmp_path: Path) -> None:

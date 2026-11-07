@@ -24,6 +24,8 @@
 - Added deterministic fault-injection cases for transient retry, changed tool arguments, and test failure followed by a file-changing fix.
 - Added a real DeepSeek hidden-evaluator recovery fixture, an enforced baseline-test gate, and a second-run success trace after an initial hidden-test failure.
 - Fixed Recovery classification for raw JSON string tool results and immediate hidden-test event recording.
+- Added two more real hidden-evaluator tasks (`fractional-tax`, `parse-percent`) and a recovery matrix report: 3/3 forced-failure runs recovered successfully.
+- Added a baseline-test-gate ablation run: without the gate, DeepSeek edited before the first test; with the gate, the run produced a first-test failure followed by a successful repair.
 
 ## Next
 
@@ -33,3 +35,5 @@
 - Add controlled fault-injection tasks that produce test failures and parameter errors for Recovery evaluation.
 - Add negative fault-injection cases where the model changes its action but still fails, and compare failure traces across Harness versions.
 - Add two more real hidden-evaluator tasks and compare prompt-only ordering with the Harness-enforced baseline-test gate.
+- Compare a fixed task with and without the Harness-enforced baseline-test gate, keeping model and fixture constant.
+- Repeat the gate ablation across more than one fixture before making a recovery-rate claim.
