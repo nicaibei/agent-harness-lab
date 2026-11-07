@@ -17,6 +17,8 @@ from evals.real_recovery import (
     HIDDEN_TESTS,
     ORDER_HIDDEN_TESTS,
     ORDER_PROJECT,
+    TEMPERATURE_HIDDEN_TESTS,
+    TEMPERATURE_PROJECT,
     RECOVERY_CASES,
     RECOVERY_PROJECT,
     _run_hidden_tests,
@@ -111,6 +113,33 @@ def test_cross_file_hidden_evaluator_requires_both_production_files(tmp_path: Pa
     )
 
     after = _run_hidden_tests(workspace, ORDER_HIDDEN_TESTS)
+    assert after["success"] is True
+
+
+def test_temperature_hidden_evaluator_requires_both_production_files(tmp_path: Path) -> None:
+    workspace = tmp_path / "temperature-report"
+    workspace.mkdir()
+    for filename in ("temperature_parser.py", "temperature_report.py"):
+        source = TEMPERATURE_PROJECT / filename
+        (workspace / filename).write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
+
+    before = _run_hidden_tests(workspace, TEMPERATURE_HIDDEN_TESTS)
+    assert before["success"] is False
+
+    (workspace / "temperature_parser.py").write_text(
+        '"""Temperature parser."""\n\n\ndef parse_reading(value: str) -> dict[str, float | str]:\n'
+        '    number_text, unit = value.split()\n'
+        '    return {"value": float(number_text), "unit": unit.upper()}\n',
+        encoding="utf-8",
+    )
+    (workspace / "temperature_report.py").write_text(
+        '"""Temperature conversion."""\n\n\ndef to_celsius(reading: dict[str, float | str],) -> float:\n'
+        '    value = float(reading["value"])\n'
+        '    return (value - 32) * 5 / 9 if reading["unit"] == "F" else value\n',
+        encoding="utf-8",
+    )
+
+    after = _run_hidden_tests(workspace, TEMPERATURE_HIDDEN_TESTS)
     assert after["success"] is True
 
 

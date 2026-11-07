@@ -29,6 +29,8 @@
 - Extended the gate ablation to `fractional-tax` and `parse-percent`; both tasks showed the same no-gate/edit-first versus gate/fail-then-repair pattern.
 - Added an offline cross-file Recovery fixture where `order_parser.py` and `order_total.py` must be fixed together; the hidden evaluator fails initially and passes after both files are repaired (`43 passed`).
 - Completed one authorized DeepSeek cross-file recovery run: the baseline gate forced `2 failed`, DeepSeek modified both production files, and the second hidden test run passed (`20261107T052728Z-a1313c18`).
+- Added a second offline cross-file fixture for temperature parsing and Fahrenheit conversion; both production files are required and the full suite passes (`44 passed`).
+- Completed one authorized DeepSeek temperature cross-file recovery run: the first hidden test failed, both production files changed, and the second hidden test passed (`20261107T070150Z-d2125766`).
 
 ## Next
 
@@ -42,3 +44,4 @@
 - Repeat the gate ablation across more than one fixture before making a recovery-rate claim.
 - Add a cross-file recovery fixture to test whether the same order guarantee holds when the model changes multiple production files.
 - Repeat cross-file recovery with a different business fixture before making a general cross-file recovery-rate claim.
+- Compare the two successful cross-file traces and add a negative cross-file case before making a recovery-rate claim.

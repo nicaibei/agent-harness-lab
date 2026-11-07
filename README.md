@@ -29,6 +29,8 @@ Issue
 - [x] 基线测试门扩展对照 v2
 - [x] 跨文件 Recovery fixture 离线验证 v1
 - [x] 跨文件 Recovery 真实运行 v1
+- [x] 跨文件 Recovery fixture 离线验证 v2
+- [x] 跨文件 Recovery 真实运行 v2
 - [ ] 任务评测集和对比实验
 
 ## 目录结构

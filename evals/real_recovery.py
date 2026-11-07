@@ -43,6 +43,8 @@ PERCENT_PROJECT = REPOSITORY_ROOT / "examples" / "recovery_percent_project"
 PERCENT_HIDDEN_TESTS = REPOSITORY_ROOT / "evals" / "hidden_tests" / "test_percent.py"
 ORDER_PROJECT = REPOSITORY_ROOT / "examples" / "recovery_order_project"
 ORDER_HIDDEN_TESTS = REPOSITORY_ROOT / "evals" / "hidden_tests" / "test_order_total.py"
+TEMPERATURE_PROJECT = REPOSITORY_ROOT / "examples" / "recovery_temperature_project"
+TEMPERATURE_HIDDEN_TESTS = REPOSITORY_ROOT / "evals" / "hidden_tests" / "test_temperature_report.py"
 RECOVERY_RUNS_ROOT = REPOSITORY_ROOT / "runs" / "recovery"
 API_KEY_ENV = "DEEPSEEK_API_KEY"
 MODEL_ENV = "DEEPSEEK_MODEL"
@@ -104,6 +106,19 @@ RECOVERY_CASES = {
             "rate. For example, parse_order('3 x 10.00') should produce "
             "{'quantity': 3, 'unit_price': 10.0}, and total_with_tax on that "
             "order with 0.2 should return 36.0."
+        ),
+    ),
+    "temperature-report": RecoveryCase(
+        task_id="real-recovery-temperature-report",
+        project=TEMPERATURE_PROJECT,
+        hidden_tests=TEMPERATURE_HIDDEN_TESTS,
+        issue=(
+            "Fix this temperature conversion across both production files. "
+            "parse_reading must preserve the numeric value and normalize the unit "
+            "to uppercase. to_celsius must convert Fahrenheit with (F - 32) * 5 / 9 "
+            "and leave Celsius unchanged. For example, parse_reading('32 F') must "
+            "return {'value': 32.0, 'unit': 'F'}, 86 F must convert to 30 C, and "
+            "20 C must remain 20 C."
         ),
     ),
 }
