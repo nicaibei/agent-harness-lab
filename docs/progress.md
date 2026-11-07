@@ -31,6 +31,7 @@
 - Completed one authorized DeepSeek cross-file recovery run: the baseline gate forced `2 failed`, DeepSeek modified both production files, and the second hidden test run passed (`20261107T052728Z-a1313c18`).
 - Added a second offline cross-file fixture for temperature parsing and Fahrenheit conversion; both production files are required and the full suite passes (`44 passed`).
 - Completed one authorized DeepSeek temperature cross-file recovery run: the first hidden test failed, both production files changed, and the second hidden test passed (`20261107T070150Z-d2125766`).
+- Added file-level ablation for both cross-file fixtures: initial, first-only, and second-only variants fail; only the both-files variant passes (`45 passed`).
 
 ## Next
 
@@ -45,3 +46,4 @@
 - Add a cross-file recovery fixture to test whether the same order guarantee holds when the model changes multiple production files.
 - Repeat cross-file recovery with a different business fixture before making a general cross-file recovery-rate claim.
 - Compare the two successful cross-file traces and add a negative cross-file case before making a recovery-rate claim.
+- Add a negative cross-file case where both files change but hidden tests remain failing.

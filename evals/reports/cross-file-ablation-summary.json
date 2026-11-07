@@ -1,0 +1,118 @@
+{
+  "experiment": "cross-file-recovery-file-ablation-v1",
+  "cases": [
+    "order-total",
+    "temperature-report"
+  ],
+  "variants": [
+    "initial",
+    "first-only",
+    "second-only",
+    "both"
+  ],
+  "results": [
+    {
+      "case": "order-total",
+      "variant": "initial",
+      "changed_files": [],
+      "success": false,
+      "expected_success": false,
+      "all_files": [
+        "order_parser.py",
+        "order_total.py"
+      ]
+    },
+    {
+      "case": "order-total",
+      "variant": "first-only",
+      "changed_files": [
+        "order_parser.py"
+      ],
+      "success": false,
+      "expected_success": false,
+      "all_files": [
+        "order_parser.py",
+        "order_total.py"
+      ]
+    },
+    {
+      "case": "order-total",
+      "variant": "second-only",
+      "changed_files": [
+        "order_total.py"
+      ],
+      "success": false,
+      "expected_success": false,
+      "all_files": [
+        "order_parser.py",
+        "order_total.py"
+      ]
+    },
+    {
+      "case": "order-total",
+      "variant": "both",
+      "changed_files": [
+        "order_parser.py",
+        "order_total.py"
+      ],
+      "success": true,
+      "expected_success": true,
+      "all_files": [
+        "order_parser.py",
+        "order_total.py"
+      ]
+    },
+    {
+      "case": "temperature-report",
+      "variant": "initial",
+      "changed_files": [],
+      "success": false,
+      "expected_success": false,
+      "all_files": [
+        "temperature_parser.py",
+        "temperature_report.py"
+      ]
+    },
+    {
+      "case": "temperature-report",
+      "variant": "first-only",
+      "changed_files": [
+        "temperature_parser.py"
+      ],
+      "success": false,
+      "expected_success": false,
+      "all_files": [
+        "temperature_parser.py",
+        "temperature_report.py"
+      ]
+    },
+    {
+      "case": "temperature-report",
+      "variant": "second-only",
+      "changed_files": [
+        "temperature_report.py"
+      ],
+      "success": false,
+      "expected_success": false,
+      "all_files": [
+        "temperature_parser.py",
+        "temperature_report.py"
+      ]
+    },
+    {
+      "case": "temperature-report",
+      "variant": "both",
+      "changed_files": [
+        "temperature_parser.py",
+        "temperature_report.py"
+      ],
+      "success": true,
+      "expected_success": true,
+      "all_files": [
+        "temperature_parser.py",
+        "temperature_report.py"
+      ]
+    }
+  ],
+  "passed_expected_matrix": true
+}
