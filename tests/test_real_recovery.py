@@ -15,6 +15,8 @@ from langgraph.checkpoint.memory import InMemorySaver
 
 from evals.real_recovery import (
     HIDDEN_TESTS,
+    ORDER_HIDDEN_TESTS,
+    ORDER_PROJECT,
     RECOVERY_CASES,
     RECOVERY_PROJECT,
     _run_hidden_tests,
@@ -83,6 +85,33 @@ def test_additional_hidden_evaluators_fail_then_pass(
     assert _run_hidden_tests(workspace, case.hidden_tests)["success"] is False
     (workspace / filename).write_text(fixed_code, encoding="utf-8")
     assert _run_hidden_tests(workspace, case.hidden_tests)["success"] is True
+
+
+def test_cross_file_hidden_evaluator_requires_both_production_files(tmp_path: Path) -> None:
+    workspace = tmp_path / "order-total"
+    workspace.mkdir()
+    for filename in ("order_parser.py", "order_total.py"):
+        source = ORDER_PROJECT / filename
+        (workspace / filename).write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
+
+    before = _run_hidden_tests(workspace, ORDER_HIDDEN_TESTS)
+    assert before["success"] is False
+
+    (workspace / "order_parser.py").write_text(
+        '"""Order parser."""\n\n\ndef parse_order(value: str) -> dict[str, float]:\n'
+        '    quantity_text, price_text = [part.strip() for part in value.split("x")]\n'
+        '    return {"quantity": int(quantity_text), "unit_price": float(price_text)}\n',
+        encoding="utf-8",
+    )
+    (workspace / "order_total.py").write_text(
+        '"""Order total calculator."""\n\n\ndef total_with_tax(order: dict[str, float], tax_rate: float) -> float:\n'
+        '    subtotal = order["quantity"] * order["unit_price"]\n'
+        '    return subtotal * (1 + tax_rate)\n',
+        encoding="utf-8",
+    )
+
+    after = _run_hidden_tests(workspace, ORDER_HIDDEN_TESTS)
+    assert after["success"] is True
 
 
 def test_recovery_task_defaults_to_baseline_gate() -> None:

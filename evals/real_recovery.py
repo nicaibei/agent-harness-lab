@@ -41,6 +41,8 @@ TAX_PROJECT = REPOSITORY_ROOT / "examples" / "recovery_tax_project"
 TAX_HIDDEN_TESTS = REPOSITORY_ROOT / "evals" / "hidden_tests" / "test_tax.py"
 PERCENT_PROJECT = REPOSITORY_ROOT / "examples" / "recovery_percent_project"
 PERCENT_HIDDEN_TESTS = REPOSITORY_ROOT / "evals" / "hidden_tests" / "test_percent.py"
+ORDER_PROJECT = REPOSITORY_ROOT / "examples" / "recovery_order_project"
+ORDER_HIDDEN_TESTS = REPOSITORY_ROOT / "evals" / "hidden_tests" / "test_order_total.py"
 RECOVERY_RUNS_ROOT = REPOSITORY_ROOT / "runs" / "recovery"
 API_KEY_ENV = "DEEPSEEK_API_KEY"
 MODEL_ENV = "DEEPSEEK_MODEL"
@@ -88,6 +90,20 @@ RECOVERY_CASES = {
             "a fractional value, while a decimal fraction stays unchanged. "
             "For example, parse_percent('20%') must return 0.2 and "
             "parse_percent('0.5') must return 0.5."
+        ),
+    ),
+    "order-total": RecoveryCase(
+        task_id="real-recovery-order-total",
+        project=ORDER_PROJECT,
+        hidden_tests=ORDER_HIDDEN_TESTS,
+        issue=(
+            "Fix this order calculation across both production files. "
+            "parse_order must parse inputs in the form 'quantity x unit_price' "
+            "into numeric quantity and unit_price fields. total_with_tax must "
+            "multiply quantity by unit_price and apply tax_rate as a fractional "
+            "rate. For example, parse_order('3 x 10.00') should produce "
+            "{'quantity': 3, 'unit_price': 10.0}, and total_with_tax on that "
+            "order with 0.2 should return 36.0."
         ),
     ),
 }
@@ -161,7 +177,8 @@ def _task_prompt(case: RecoveryCase) -> str:
         f"Issue: {case.issue}\n\n"
         "Inspect the implementation before editing. Use the provided "
         "run_tests tool to validate the change. If the first test run fails, inspect "
-        "the failure output, make one focused repair, and run the tests again. Do not "
+        "the failure output, make focused repairs in the necessary production files, "
+        "and run the tests again. Do not "
         "modify tests or claim success unless the test tool confirms it."
     )
 

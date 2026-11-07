@@ -26,6 +26,9 @@ Issue
 - [x] 真实 DeepSeek 隐藏评测与基线测试门 v1
 - [x] 真实 Recovery 矩阵 v1（3 个失败后恢复任务）
 - [x] 基线测试门 A/B 对照 v1
+- [x] 基线测试门扩展对照 v2
+- [x] 跨文件 Recovery fixture 离线验证 v1
+- [x] 跨文件 Recovery 真实运行 v1
 - [ ] 任务评测集和对比实验
 
 ## 目录结构

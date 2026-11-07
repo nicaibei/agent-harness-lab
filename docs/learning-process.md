@@ -400,6 +400,42 @@ A 组第一次测试直接通过，说明模型先修改了代码；B 组第一�
 
 在更多 recovery fixture 上重复有门/无门对照，再讨论基线门对恢复率的影响。当前样本不足以做统计结论。
 
+阶段 9 的扩展对照已覆盖 `fractional-tax` 和 `parse-percent`，两个任务都复现了无门时先修改、有门时先失败后修复的顺序差异。实验报告见 [baseline-gate-ablation-v2.md](baseline-gate-ablation-v2.md)。下一步进入跨文件 fixture。
+
+## 阶段 10：跨文件 Recovery fixture 离线验证
+
+### 目标和设计判断
+
+单文件任务只能证明 Agent 修正一个局部实现。本阶段先构造一个需要同时修改 `order_parser.py` 和 `order_total.py` 的任务，观察测试工具、基线门和 diff 记录是否能承载跨文件修复。为了避免把 Harness fixture 验证误认为模型能力，本轮暂不调用 DeepSeek。
+
+### 故障和调用链
+
+初始 parser 交换了数量和单价，total calculator 又使用了错误的加法和税率逻辑。隐藏测试在 workspace 外，分别检查解析字典和最终总价。预期链路是：
+
+```text
+基线门拒绝提前编辑
+  ↓
+隐藏测试失败
+  ↓
+模型看到失败输出
+  ↓
+修改两个生产文件
+  ↓
+隐藏测试通过
+```
+
+### 离线结果
+
+测试先确认原始项目失败，再写入两个正确的生产文件并确认测试通过。全量测试为 `43 passed`。新增 fixture 接入了 `RECOVERY_CASES`，真实运行命令使用 `--case order-total`。
+
+### 本阶段能证明什么
+
+真实运行 `20261107T052728Z-a1313c18` 首次隐藏测试为 `2 failed`，随后 DeepSeek 同时修改了两个生产文件，第二次测试为 `2 passed`。这证明了本次运行中的跨文件纠错链路。它不能估计跨文件 recovery 的总体成功率，因为样本只有一个真实任务；还需要不同业务 fixture 重复实验。
+
+本次运行还帮助区分了两个日志概念：`test_run.success=false` 表示隐藏测试断言失败；`recovery_success` 表示测试工具本身正常返回，不等同于测试通过。另有一次 `ls /workspace` 探索路径错误，属于工具探索失败，不属于业务测试失败。
+
+实验报告见 [cross-file-recovery-v1.md](cross-file-recovery-v1.md)。
+
 ## 学习和工程纪律
 
 每完成一个阶段，都先做以下复盘，再决定是否提交 GitHub：

@@ -85,3 +85,5 @@ return float(text)
 样本仍然很小，三个任务都是单文件 toy 项目，且全部使用同一个模型和相同 Harness 配置。当前结果证明链路可迁移，不足以估计复杂仓库中的恢复率。
 
 下一步可以增加跨文件 fixture，或做有无基线测试门的对照实验；对照实验需要保持任务和模型配置一致，避免把模型随机性误判为 Harness 效果。
+
+阶段 9 的对照已经扩展到 `fractional-tax` 和 `parse-percent`，详见 [baseline-gate-ablation-v2.md](baseline-gate-ablation-v2.md)。

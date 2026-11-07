@@ -44,6 +44,12 @@ def _summarize(path: Path) -> dict[str, Any]:
         "recovered_after_failure": bool(
             tests and tests[0].get("success") is False and tests[-1].get("success") is True
         ),
+        "edited_before_first_test": bool(
+            report.get("baseline_gate") is False
+            and bool(report.get("diff"))
+            and tests
+            and tests[0].get("success") is True
+        ),
         "policy_denials": sum(
             event.get("event") == "policy_decision" and event.get("decision") == "deny"
             for event in events
@@ -72,6 +78,7 @@ def build_report(runs_dir: Path) -> dict[str, Any]:
         "run_count": len(runs),
         "successful_runs": sum(run["tests_passed"] is True for run in runs),
         "recovered_after_failure": sum(run["recovered_after_failure"] for run in runs),
+        "edited_before_first_test": sum(run["edited_before_first_test"] for run in runs),
         "runs": runs,
     }
 
