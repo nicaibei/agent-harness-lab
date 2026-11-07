@@ -1,0 +1,52 @@
+{
+  "generated_at": "2026-11-07T09:02:13.174251+00:00",
+  "task_id": "real-recovery-parse-duration",
+  "run_count": 3,
+  "final_successes": 3,
+  "first_test_failures": 3,
+  "recovered_after_failure": 3,
+  "diff_chars": {
+    "min": 1259,
+    "max": 1346,
+    "mean": 1294.6666666666667
+  },
+  "exploration_errors": 2,
+  "runs": [
+    {
+      "run_id": "20261107T085436Z-6468b485",
+      "first_test_passed": false,
+      "last_test_passed": true,
+      "recovered_after_failure": true,
+      "completed": true,
+      "tests_passed": true,
+      "diff_chars": 1279,
+      "changed_files": [],
+      "policy_denials": 1,
+      "exploration_errors": 1
+    },
+    {
+      "run_id": "20261107T085943Z-5d0bc97d",
+      "first_test_passed": false,
+      "last_test_passed": true,
+      "recovered_after_failure": true,
+      "completed": true,
+      "tests_passed": true,
+      "diff_chars": 1259,
+      "changed_files": [],
+      "policy_denials": 1,
+      "exploration_errors": 0
+    },
+    {
+      "run_id": "20261107T085944Z-7f858621",
+      "first_test_passed": false,
+      "last_test_passed": true,
+      "recovered_after_failure": true,
+      "completed": true,
+      "tests_passed": true,
+      "diff_chars": 1346,
+      "changed_files": [],
+      "policy_denials": 1,
+      "exploration_errors": 1
+    }
+  ]
+}

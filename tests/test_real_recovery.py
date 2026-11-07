@@ -14,11 +14,19 @@ from langchain_core.messages import AIMessage, ToolMessage
 from langgraph.checkpoint.memory import InMemorySaver
 
 from evals.real_recovery import (
+    CSV_HIDDEN_TESTS,
+    CSV_PROJECT,
+    DURATION_HIDDEN_TESTS,
+    DURATION_PROJECT,
     HIDDEN_TESTS,
     ORDER_HIDDEN_TESTS,
     ORDER_PROJECT,
     TEMPERATURE_HIDDEN_TESTS,
     TEMPERATURE_PROJECT,
+    SAFE_MATH_HIDDEN_TESTS,
+    SAFE_MATH_PROJECT,
+    UNIQUE_HIDDEN_TESTS,
+    UNIQUE_PROJECT,
     RECOVERY_CASES,
     RECOVERY_PROJECT,
     _run_hidden_tests,
@@ -141,6 +149,72 @@ def test_temperature_hidden_evaluator_requires_both_production_files(tmp_path: P
 
     after = _run_hidden_tests(workspace, TEMPERATURE_HIDDEN_TESTS)
     assert after["success"] is True
+
+
+@pytest.mark.parametrize(
+    ("case_name", "project", "hidden_tests", "filename", "fixed_code"),
+    [
+        (
+            "csv-row",
+            CSV_PROJECT,
+            CSV_HIDDEN_TESTS,
+            "row.py",
+            '"""CSV row parser."""\n\n\ndef parse_row(value: str) -> dict[str, int | str]:\n'
+            '    name, score_text = [part.strip() for part in value.split(",")]\n'
+            '    return {"name": name, "score": int(score_text)}\n',
+        ),
+        (
+            "stable-unique",
+            UNIQUE_PROJECT,
+            UNIQUE_HIDDEN_TESTS,
+            "unique.py",
+            '"""Stable deduplication."""\n\n\ndef unique_in_order(values: list[int]) -> list[int]:\n'
+            '    seen: set[int] = set()\n'
+            '    result: list[int] = []\n'
+            '    for value in values:\n'
+            '        if value not in seen:\n'
+            '            seen.add(value)\n'
+            '            result.append(value)\n'
+            '    return result\n',
+        ),
+        (
+            "safe-divide",
+            SAFE_MATH_PROJECT,
+            SAFE_MATH_HIDDEN_TESTS,
+            "safe_math.py",
+            '"""Safe division."""\n\n\ndef safe_divide(left: float, right: float) -> float | None:\n'
+            '    return None if right == 0 else left / right\n',
+        ),
+        (
+            "parse-duration",
+            DURATION_PROJECT,
+            DURATION_HIDDEN_TESTS,
+            "duration.py",
+            '"""Duration parser."""\n\n\ndef parse_duration(value: str) -> int:\n'
+            '    total = 0\n'
+            '    for token in value.split():\n'
+            '        amount = int(token[:-1])\n'
+            '        total += amount * (3600 if token.endswith("h") else 60)\n'
+            '    return total\n',
+        ),
+    ],
+)
+def test_expanded_hidden_evaluators_fail_then_pass(
+    tmp_path: Path,
+    case_name: str,
+    project: Path,
+    hidden_tests: Path,
+    filename: str,
+    fixed_code: str,
+) -> None:
+    workspace = tmp_path / case_name
+    workspace.mkdir()
+    source = project / filename
+    (workspace / filename).write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
+
+    assert _run_hidden_tests(workspace, hidden_tests)["success"] is False
+    (workspace / filename).write_text(fixed_code, encoding="utf-8")
+    assert _run_hidden_tests(workspace, hidden_tests)["success"] is True
 
 
 def test_recovery_task_defaults_to_baseline_gate() -> None:

@@ -45,6 +45,14 @@ ORDER_PROJECT = REPOSITORY_ROOT / "examples" / "recovery_order_project"
 ORDER_HIDDEN_TESTS = REPOSITORY_ROOT / "evals" / "hidden_tests" / "test_order_total.py"
 TEMPERATURE_PROJECT = REPOSITORY_ROOT / "examples" / "recovery_temperature_project"
 TEMPERATURE_HIDDEN_TESTS = REPOSITORY_ROOT / "evals" / "hidden_tests" / "test_temperature_report.py"
+CSV_PROJECT = REPOSITORY_ROOT / "examples" / "recovery_csv_project"
+CSV_HIDDEN_TESTS = REPOSITORY_ROOT / "evals" / "hidden_tests" / "test_row.py"
+UNIQUE_PROJECT = REPOSITORY_ROOT / "examples" / "recovery_unique_project"
+UNIQUE_HIDDEN_TESTS = REPOSITORY_ROOT / "evals" / "hidden_tests" / "test_unique.py"
+SAFE_MATH_PROJECT = REPOSITORY_ROOT / "examples" / "recovery_safe_math_project"
+SAFE_MATH_HIDDEN_TESTS = REPOSITORY_ROOT / "evals" / "hidden_tests" / "test_safe_math.py"
+DURATION_PROJECT = REPOSITORY_ROOT / "examples" / "recovery_duration_project"
+DURATION_HIDDEN_TESTS = REPOSITORY_ROOT / "evals" / "hidden_tests" / "test_duration.py"
 RECOVERY_RUNS_ROOT = REPOSITORY_ROOT / "runs" / "recovery"
 API_KEY_ENV = "DEEPSEEK_API_KEY"
 MODEL_ENV = "DEEPSEEK_MODEL"
@@ -119,6 +127,43 @@ RECOVERY_CASES = {
             "and leave Celsius unchanged. For example, parse_reading('32 F') must "
             "return {'value': 32.0, 'unit': 'F'}, 86 F must convert to 30 C, and "
             "20 C must remain 20 C."
+        ),
+    ),
+    "csv-row": RecoveryCase(
+        task_id="real-recovery-csv-row",
+        project=CSV_PROJECT,
+        hidden_tests=CSV_HIDDEN_TESTS,
+        issue=(
+            "Fix parse_row so it parses 'name, score' into a dictionary with a "
+            "trimmed string name and integer score. For example, 'Alice, 42' "
+            "must produce {'name': 'Alice', 'score': 42}."
+        ),
+    ),
+    "stable-unique": RecoveryCase(
+        task_id="real-recovery-stable-unique",
+        project=UNIQUE_PROJECT,
+        hidden_tests=UNIQUE_HIDDEN_TESTS,
+        issue=(
+            "Fix unique_in_order so it removes duplicates while preserving the "
+            "first-seen order. For example, [3, 1, 3, 2, 1] must become [3, 1, 2]."
+        ),
+    ),
+    "safe-divide": RecoveryCase(
+        task_id="real-recovery-safe-divide",
+        project=SAFE_MATH_PROJECT,
+        hidden_tests=SAFE_MATH_HIDDEN_TESTS,
+        issue=(
+            "Fix safe_divide so it returns the quotient for a nonzero denominator "
+            "and returns None instead of raising when the denominator is zero."
+        ),
+    ),
+    "parse-duration": RecoveryCase(
+        task_id="real-recovery-parse-duration",
+        project=DURATION_PROJECT,
+        hidden_tests=DURATION_HIDDEN_TESTS,
+        issue=(
+            "Fix parse_duration so it converts hours and minutes such as '1h 30m' "
+            "to total seconds, while also supporting minutes-only inputs such as '45m'."
         ),
     ),
 }

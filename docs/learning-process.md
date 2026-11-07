@@ -502,6 +502,24 @@ A 组第一次测试直接通过，说明模型先修改了代码；B 组第一�
 
 实验报告见 [formal-evaluation-matrix-v1.md](formal-evaluation-matrix-v1.md)。
 
+## 阶段 15：扩展任务集 v1
+
+### 目标和设计判断
+
+原来的 10 个 Baseline 任务集中在计算器项目，不能代表不同业务错误。本阶段新增 CSV 解析、保序去重、安全除法和时长解析四类单文件任务，并把两个跨文件任务纳入同一份清单。每个任务都声明类别、难度、预期修改文件和重复运行目标。
+
+### 离线验证
+
+四个新 fixture 都经过隐藏测试的“初始失败、修复后通过”验证。任务清单校验器确认路径、类别、任务 ID 和重复目标合法。全量测试为 `52 passed`。随后授权运行四个新任务各一次：`csv-row`、`stable-unique`、`safe-divide` 和 `parse-duration` 都首次测试失败、第二次测试通过，并只修改了预期的单个生产文件。
+
+### 下一步真实实验
+
+每个新任务目前只有一次真实运行，只有 `parse-duration` 已经完成三次重复。三次都首次测试失败、最终测试通过、失败后恢复成功；diff 长度在 1259 到 1346 之间，前两次出现一次探索工具错误，第三次没有。这说明模型的最终结果在本任务上稳定，但中间策略和工具探索存在随机性。重复报告见 [repeat-real-recovery-parse-duration.md](../evals/reports/repeat-real-recovery-parse-duration.md)。
+
+下一步可以重复其他类别，或准备一个更接近真实仓库结构的小型 fixture；仍需保持模型、基线门、提示词和测试预算不变。
+
+实验报告见 [expanded-task-set-v1.md](expanded-task-set-v1.md)。
+
 ## 学习和工程纪律
 
 每完成一个阶段，都先做以下复盘，再决定是否提交 GitHub：

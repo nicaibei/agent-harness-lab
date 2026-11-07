@@ -34,6 +34,9 @@
 - Added file-level ablation for both cross-file fixtures: initial, first-only, and second-only variants fail; only the both-files variant passes (`45 passed`).
 - Added controlled negative cross-file cases: both production files change but hidden tests remain failing, classified as `modified_but_failed` (`46 passed`).
 - Added a formal evaluation matrix that keeps Baseline, fault injection, real Recovery, ablation, and negative-case denominators separate (`47 passed`).
+- Added an expanded task manifest with four new single-file Recovery fixtures and two existing cross-file fixtures across five error categories (`52 passed`).
+- Ran the four new task types once with DeepSeek; all four had a failing first hidden test and a passing second test, bringing real Recovery to 15 runs and 11 recovered-after-failure runs.
+- Repeated `parse-duration` twice under the same configuration; all 3 runs recovered, with diff sizes from 1259 to 1346 characters and 2 exploration errors.
 
 ## Next
 
@@ -51,3 +54,4 @@
 - Add a negative cross-file case where both files change but hidden tests remain failing.
 - Consolidate successful, ablation, and negative cases into one formal evaluation matrix.
 - Expand the formal task set and repeat selected real tasks before making broader recovery claims.
+- Repeat the other expanded categories or add a small real-repository fixture, using the `parse-duration` report as the variance baseline.

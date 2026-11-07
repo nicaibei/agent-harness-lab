@@ -1,0 +1,74 @@
+[
+  {
+    "id": "real-recovery-csv-row",
+    "case": "csv-row",
+    "category": "structured_text",
+    "difficulty": "small",
+    "project": "examples/recovery_csv_project",
+    "hidden_tests": "evals/hidden_tests/test_row.py",
+    "expected_files": ["row.py"],
+    "repeat_target": 3,
+    "status": "real_validated_once",
+    "issue": "Parse a comma-separated name and score into trimmed fields with an integer score."
+  },
+  {
+    "id": "real-recovery-stable-unique",
+    "case": "stable-unique",
+    "category": "sequence_logic",
+    "difficulty": "small",
+    "project": "examples/recovery_unique_project",
+    "hidden_tests": "evals/hidden_tests/test_unique.py",
+    "expected_files": ["unique.py"],
+    "repeat_target": 3,
+    "status": "real_validated_once",
+    "issue": "Remove duplicates while preserving first-seen order."
+  },
+  {
+    "id": "real-recovery-safe-divide",
+    "case": "safe-divide",
+    "category": "error_handling",
+    "difficulty": "small",
+    "project": "examples/recovery_safe_math_project",
+    "hidden_tests": "evals/hidden_tests/test_safe_math.py",
+    "expected_files": ["safe_math.py"],
+    "repeat_target": 3,
+    "status": "real_validated_once",
+    "issue": "Return None for a zero denominator while preserving normal division."
+  },
+  {
+    "id": "real-recovery-parse-duration",
+    "case": "parse-duration",
+    "category": "unit_parsing",
+    "difficulty": "medium",
+    "project": "examples/recovery_duration_project",
+    "hidden_tests": "evals/hidden_tests/test_duration.py",
+    "expected_files": ["duration.py"],
+    "repeat_target": 3,
+    "status": "real_validated_once",
+    "issue": "Convert hour and minute tokens into total seconds."
+  },
+  {
+    "id": "real-recovery-order-total",
+    "case": "order-total",
+    "category": "cross_file_contract",
+    "difficulty": "medium",
+    "project": "examples/recovery_order_project",
+    "hidden_tests": "evals/hidden_tests/test_order_total.py",
+    "expected_files": ["order_parser.py", "order_total.py"],
+    "repeat_target": 3,
+    "status": "real_validated",
+    "issue": "Repair the parser and total calculator contract across two production files."
+  },
+  {
+    "id": "real-recovery-temperature-report",
+    "case": "temperature-report",
+    "category": "cross_file_contract",
+    "difficulty": "medium",
+    "project": "examples/recovery_temperature_project",
+    "hidden_tests": "evals/hidden_tests/test_temperature_report.py",
+    "expected_files": ["temperature_parser.py", "temperature_report.py"],
+    "repeat_target": 3,
+    "status": "real_validated",
+    "issue": "Repair temperature parsing and Fahrenheit conversion across two production files."
+  }
+]

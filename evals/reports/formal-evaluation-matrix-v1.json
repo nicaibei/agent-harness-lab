@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-07T07:42:48.208455+00:00",
+  "generated_at": "2026-11-07T09:03:03.667738+00:00",
   "definition": {
     "task_success": "completed=true and final tests_passed=true",
     "recovery_success": "first test fails, a valid production diff exists, and final test passes",
@@ -23,9 +23,9 @@
       "failed_cases": 1
     },
     "real_recovery": {
-      "runs": 9,
-      "final_test_passes": 9,
-      "recovered_after_failure": 5,
+      "runs": 17,
+      "final_test_passes": 17,
+      "recovered_after_failure": 13,
       "edited_before_first_test": 3
     },
     "cross_file_ablation": {
