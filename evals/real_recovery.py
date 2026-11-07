@@ -55,6 +55,7 @@ DURATION_PROJECT = REPOSITORY_ROOT / "examples" / "recovery_duration_project"
 DURATION_HIDDEN_TESTS = REPOSITORY_ROOT / "evals" / "hidden_tests" / "test_duration.py"
 INVENTORY_PROJECT = REPOSITORY_ROOT / "examples" / "recovery_inventory_repo"
 INVENTORY_HIDDEN_TESTS = REPOSITORY_ROOT / "evals" / "hidden_tests" / "test_inventory_repo.py"
+INVENTORY_CONFIG_PROJECT = REPOSITORY_ROOT / "examples" / "recovery_inventory_config_repo"
 RECOVERY_RUNS_ROOT = REPOSITORY_ROOT / "runs" / "recovery"
 API_KEY_ENV = "DEEPSEEK_API_KEY"
 MODEL_ENV = "DEEPSEEK_MODEL"
@@ -180,6 +181,18 @@ RECOVERY_CASES = {
             "checkout_total must apply the fractional tax rate to the stock-limited "
             "subtotal. Inspect the layered tests through the run_tests output and "
             "repair the production modules without changing tests."
+        ),
+    ),
+    "inventory-config": RecoveryCase(
+        task_id="real-recovery-inventory-config",
+        project=INVENTORY_CONFIG_PROJECT,
+        hidden_tests=INVENTORY_HIDDEN_TESTS,
+        issue=(
+            "Fix the checkout configuration. The JSON tax_rate is expressed as "
+            "a fractional rate, so change the incorrect configuration value to "
+            "0.2. The Python implementation is already correct; do not modify "
+            "production modules or tests. Run the hidden tests before and after "
+            "the focused configuration repair."
         ),
     ),
 }

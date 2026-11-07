@@ -19,6 +19,8 @@ from evals.real_recovery import (
     DURATION_HIDDEN_TESTS,
     DURATION_PROJECT,
     HIDDEN_TESTS,
+    INVENTORY_CONFIG_PROJECT,
+    INVENTORY_HIDDEN_TESTS,
     ORDER_HIDDEN_TESTS,
     ORDER_PROJECT,
     TEMPERATURE_HIDDEN_TESTS,
@@ -215,6 +217,31 @@ def test_expanded_hidden_evaluators_fail_then_pass(
     assert _run_hidden_tests(workspace, hidden_tests)["success"] is False
     (workspace / filename).write_text(fixed_code, encoding="utf-8")
     assert _run_hidden_tests(workspace, hidden_tests)["success"] is True
+
+
+def test_inventory_config_evaluator_requires_only_config_repair(tmp_path: Path) -> None:
+    workspace = tmp_path / "inventory-config"
+    for source in INVENTORY_CONFIG_PROJECT.rglob("*"):
+        if source.is_file():
+            target = workspace / source.relative_to(INVENTORY_CONFIG_PROJECT)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(source.read_bytes())
+
+    before = _run_hidden_tests(workspace, INVENTORY_HIDDEN_TESTS)
+    assert before["success"] is False
+    assert "2 failed, 1 passed" in before["output"]
+    original_settings = (
+        INVENTORY_CONFIG_PROJECT / "inventory_app" / "settings.py"
+    ).read_text(encoding="utf-8")
+    assert (workspace / "inventory_app" / "settings.py").read_text(encoding="utf-8") == original_settings
+
+    config_path = workspace / "config" / "checkout.json"
+    config_path.write_text(
+        config_path.read_text(encoding="utf-8").replace('"tax_rate": 20', '"tax_rate": 0.2'),
+        encoding="utf-8",
+    )
+    after = _run_hidden_tests(workspace, INVENTORY_HIDDEN_TESTS)
+    assert after["success"] is True
 
 
 def test_recovery_task_defaults_to_baseline_gate() -> None:

@@ -86,5 +86,17 @@
     "repeat_target": 3,
     "status": "real_validated_once",
     "issue": "Repair configuration loading, stock-limited catalog calculation, and checkout tax application across a repository-shaped fixture."
+  },
+  {
+    "id": "real-recovery-inventory-config",
+    "case": "inventory-config",
+    "category": "repository_integration",
+    "difficulty": "medium",
+    "project": "examples/recovery_inventory_config_repo",
+    "hidden_tests": "evals/hidden_tests/test_inventory_repo.py",
+    "expected_files": ["config/checkout.json"],
+    "repeat_target": 3,
+    "status": "real_validated_once",
+    "issue": "Repair the incorrect fractional tax rate in the repository configuration without changing the already-correct Python modules."
   }
 ]

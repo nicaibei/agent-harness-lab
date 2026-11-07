@@ -1,0 +1,52 @@
+{
+  "generated_at": "2026-11-07T10:03:01.765890+00:00",
+  "task_id": "real-recovery-inventory-config",
+  "run_count": 3,
+  "final_successes": 3,
+  "first_test_failures": 3,
+  "recovered_after_failure": 3,
+  "diff_chars": {
+    "min": 136,
+    "max": 136,
+    "mean": 136
+  },
+  "exploration_errors": 3,
+  "runs": [
+    {
+      "run_id": "20261107T095602Z-fe966317",
+      "first_test_passed": false,
+      "last_test_passed": true,
+      "recovered_after_failure": true,
+      "completed": true,
+      "tests_passed": true,
+      "diff_chars": 136,
+      "changed_files": [],
+      "policy_denials": 0,
+      "exploration_errors": 1
+    },
+    {
+      "run_id": "20261107T100134Z-9f4eff5c",
+      "first_test_passed": false,
+      "last_test_passed": true,
+      "recovered_after_failure": true,
+      "completed": true,
+      "tests_passed": true,
+      "diff_chars": 136,
+      "changed_files": [],
+      "policy_denials": 0,
+      "exploration_errors": 1
+    },
+    {
+      "run_id": "20261107T100202Z-8eb54354",
+      "first_test_passed": false,
+      "last_test_passed": true,
+      "recovered_after_failure": true,
+      "completed": true,
+      "tests_passed": true,
+      "diff_chars": 136,
+      "changed_files": [],
+      "policy_denials": 0,
+      "exploration_errors": 1
+    }
+  ]
+}

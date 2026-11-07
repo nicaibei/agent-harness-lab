@@ -1,0 +1,1 @@
+"""Inventory checkout configuration fixture."""
