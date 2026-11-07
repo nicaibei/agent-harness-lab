@@ -1,8 +1,8 @@
 # Real Recovery 矩阵汇总
 
-- 运行数：17
-- 最终测试通过：17
-- 失败后恢复成功：13
+- 运行数：18
+- 最终测试通过：18
+- 失败后恢复成功：14
 
 | 任务 | 基线门 | 首次测试 | 最后测试 | 失败后恢复 | Policy 拒绝 | 测试失败结果 | 测试 Recovery 事件 | diff |
 | --- | --- | --- | --- | --- | ---: | ---: | ---: | ---: |
@@ -23,3 +23,4 @@
 | `real-recovery-safe-divide` | True | False | True | True | 1 | 1 | 0 | 253 |
 | `real-recovery-parse-duration` | True | False | True | True | 1 | 1 | 0 | 1259 |
 | `real-recovery-parse-duration` | True | False | True | True | 1 | 1 | 0 | 1346 |
+| `real-recovery-inventory-checkout` | True | False | True | True | 0 | 1 | 0 | 2576 |

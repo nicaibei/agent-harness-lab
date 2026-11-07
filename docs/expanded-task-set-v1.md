@@ -2,7 +2,7 @@
 
 ## 实验目标
 
-原来的 10 个 Baseline 任务都来自同一个计算器项目，适合作为稳定性对照，但不能覆盖不同业务错误。本阶段新增 4 个单文件 Recovery fixture，并把已有 2 个跨文件 fixture 纳入统一任务清单。
+原来的 10 个 Baseline 任务都来自同一个计算器项目，适合作为稳定性对照，但不能覆盖不同业务错误。本阶段新增 4 个单文件 Recovery fixture、2 个跨文件 fixture，并加入 1 个仓库形态集成 fixture。
 
 ## 任务类型
 
@@ -13,6 +13,7 @@
 | `error_handling` | `safe-divide` | 零除数返回约定值 |
 | `unit_parsing` | `parse-duration` | 小时、分钟单位换算 |
 | `cross_file_contract` | `order-total`、`temperature-report` | 两个生产文件之间的数据契约 |
+| `repository_integration` | `inventory-checkout` | 配置、目录和服务层之间的调用关系 |
 
 每个任务都声明：项目目录、workspace 外隐藏测试、预期修改文件、难度和真实重复次数目标。清单位于 [expanded_tasks.json](../evals/expanded_tasks.json)，由 `evals/task_manifest.py` 校验。
 
@@ -20,7 +21,7 @@
 
 四个新任务都满足：原始 fixture 的隐藏测试失败，写入正确实现后隐藏测试通过。任务清单测试确认 6 个任务 ID 唯一、路径存在、类别完整、重复目标合法。当前全量测试为 `52 passed`。
 
-离线准备阶段没有调用 DeepSeek；随后已授权运行 4 个新任务各 1 次，4 次都首次测试失败、最终测试通过，并且各自只修改了预期的生产文件。真实 Recovery 汇总在这批首轮运行后是 15 次运行、15 次最终通过、11 次失败后恢复。随后对 `parse-duration` 重复两次，三次运行都恢复成功，diff 字符数为 1259 到 1346，探索工具错误出现 2 次。继续重复仍然不需要租服务器。
+离线准备阶段没有调用 DeepSeek；随后已授权运行 4 个新任务各 1 次，4 次都首次测试失败、最终测试通过，并且各自只修改了预期的生产文件。真实 Recovery 汇总在这批首轮运行后是 15 次运行、15 次最终通过、11 次失败后恢复。随后对 `parse-duration` 重复两次，三次运行都恢复成功，diff 字符数为 1259 到 1346，探索工具错误出现 2 次。最后运行仓库形态 `inventory-checkout`，首次三层测试失败，三个模块都被修改，第二次三层测试通过。
 
 ## 设计边界
 

@@ -10,7 +10,7 @@ def test_formal_matrix_keeps_experiment_denominators_separate() -> None:
     groups = report["groups"]
 
     assert groups["baseline"]["attempts"] == 14
-    assert groups["real_recovery"]["recovered_after_failure"] == 13
+    assert groups["real_recovery"]["recovered_after_failure"] == 14
     assert groups["cross_file_ablation"]["both_files_passed"] == 2
     assert groups["cross_file_negative"]["modified_but_failed"] == 2
     assert "不计算一个混合成功率" in render_markdown(report)

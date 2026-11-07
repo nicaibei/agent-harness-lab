@@ -70,5 +70,21 @@
     "repeat_target": 3,
     "status": "real_validated",
     "issue": "Repair temperature parsing and Fahrenheit conversion across two production files."
+  },
+  {
+    "id": "real-recovery-inventory-checkout",
+    "case": "inventory-checkout",
+    "category": "repository_integration",
+    "difficulty": "large",
+    "project": "examples/recovery_inventory_repo",
+    "hidden_tests": "evals/hidden_tests/test_inventory_repo.py",
+    "expected_files": [
+      "inventory_app/settings.py",
+      "inventory_app/catalog.py",
+      "inventory_app/checkout.py"
+    ],
+    "repeat_target": 3,
+    "status": "real_validated_once",
+    "issue": "Repair configuration loading, stock-limited catalog calculation, and checkout tax application across a repository-shaped fixture."
   }
 ]

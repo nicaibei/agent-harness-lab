@@ -53,6 +53,8 @@ SAFE_MATH_PROJECT = REPOSITORY_ROOT / "examples" / "recovery_safe_math_project"
 SAFE_MATH_HIDDEN_TESTS = REPOSITORY_ROOT / "evals" / "hidden_tests" / "test_safe_math.py"
 DURATION_PROJECT = REPOSITORY_ROOT / "examples" / "recovery_duration_project"
 DURATION_HIDDEN_TESTS = REPOSITORY_ROOT / "evals" / "hidden_tests" / "test_duration.py"
+INVENTORY_PROJECT = REPOSITORY_ROOT / "examples" / "recovery_inventory_repo"
+INVENTORY_HIDDEN_TESTS = REPOSITORY_ROOT / "evals" / "hidden_tests" / "test_inventory_repo.py"
 RECOVERY_RUNS_ROOT = REPOSITORY_ROOT / "runs" / "recovery"
 API_KEY_ENV = "DEEPSEEK_API_KEY"
 MODEL_ENV = "DEEPSEEK_MODEL"
@@ -164,6 +166,20 @@ RECOVERY_CASES = {
         issue=(
             "Fix parse_duration so it converts hours and minutes such as '1h 30m' "
             "to total seconds, while also supporting minutes-only inputs such as '45m'."
+        ),
+    ),
+    "inventory-checkout": RecoveryCase(
+        task_id="real-recovery-inventory-checkout",
+        project=INVENTORY_PROJECT,
+        hidden_tests=INVENTORY_HIDDEN_TESTS,
+        issue=(
+            "Fix the inventory checkout repository across its configuration, "
+            "catalog, and checkout layers. Read the JSON configuration instead "
+            "of guessing values. load_settings must preserve tax_rate as a "
+            "fraction. subtotal must cap requested quantities at available stock. "
+            "checkout_total must apply the fractional tax rate to the stock-limited "
+            "subtotal. Inspect the layered tests through the run_tests output and "
+            "repair the production modules without changing tests."
         ),
     ),
 }

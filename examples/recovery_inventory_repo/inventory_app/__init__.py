@@ -1,0 +1,1 @@
+"""Inventory checkout application fixture."""

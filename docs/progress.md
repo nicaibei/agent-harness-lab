@@ -37,6 +37,8 @@
 - Added an expanded task manifest with four new single-file Recovery fixtures and two existing cross-file fixtures across five error categories (`52 passed`).
 - Ran the four new task types once with DeepSeek; all four had a failing first hidden test and a passing second test, bringing real Recovery to 15 runs and 11 recovered-after-failure runs.
 - Repeated `parse-duration` twice under the same configuration; all 3 runs recovered, with diff sizes from 1259 to 1346 characters and 2 exploration errors.
+- Added a repository-shaped inventory checkout fixture with configuration, package modules, and layered hidden tests; offline validation passes (`54 passed`).
+- Completed one authorized DeepSeek repository-shaped Recovery run: three layered tests failed first, three production modules changed, and all three passed on the second run (`20261107T091935Z-160b0df4`).
 
 ## Next
 
@@ -55,3 +57,4 @@
 - Consolidate successful, ablation, and negative cases into one formal evaluation matrix.
 - Expand the formal task set and repeat selected real tasks before making broader recovery claims.
 - Repeat the other expanded categories or add a small real-repository fixture, using the `parse-duration` report as the variance baseline.
+- Add a package-level or configuration-error case, then compare it with the repository-shaped trace before considering a larger fixture.

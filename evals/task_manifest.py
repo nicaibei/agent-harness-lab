@@ -10,7 +10,14 @@ from typing import Mapping
 
 MANIFEST_PATH = Path(__file__).with_name("expanded_tasks.json")
 ALLOWED_CATEGORIES = frozenset(
-    {"structured_text", "sequence_logic", "error_handling", "unit_parsing", "cross_file_contract"}
+    {
+        "structured_text",
+        "sequence_logic",
+        "error_handling",
+        "unit_parsing",
+        "cross_file_contract",
+        "repository_integration",
+    }
 )
 
 
