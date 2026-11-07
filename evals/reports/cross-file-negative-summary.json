@@ -1,0 +1,28 @@
+{
+  "experiment": "cross-file-recovery-negative-v1",
+  "results": [
+    {
+      "case": "order-total",
+      "changed_files": [
+        "order_parser.py",
+        "order_total.py"
+      ],
+      "diff_expected": true,
+      "tests_passed": false,
+      "expected_tests_passed": false,
+      "classification": "modified_but_failed"
+    },
+    {
+      "case": "temperature-report",
+      "changed_files": [
+        "temperature_parser.py",
+        "temperature_report.py"
+      ],
+      "diff_expected": true,
+      "tests_passed": false,
+      "expected_tests_passed": false,
+      "classification": "modified_but_failed"
+    }
+  ],
+  "all_classified_correctly": true
+}

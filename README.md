@@ -32,6 +32,7 @@ Issue
 - [x] 跨文件 Recovery fixture 离线验证 v2
 - [x] 跨文件 Recovery 真实运行 v2
 - [x] 跨文件文件级消融 v1
+- [x] 跨文件负面案例 v1
 - [ ] 任务评测集和对比实验
 
 ## 目录结构
