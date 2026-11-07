@@ -33,6 +33,7 @@
 - Completed one authorized DeepSeek temperature cross-file recovery run: the first hidden test failed, both production files changed, and the second hidden test passed (`20261107T070150Z-d2125766`).
 - Added file-level ablation for both cross-file fixtures: initial, first-only, and second-only variants fail; only the both-files variant passes (`45 passed`).
 - Added controlled negative cross-file cases: both production files change but hidden tests remain failing, classified as `modified_but_failed` (`46 passed`).
+- Added a formal evaluation matrix that keeps Baseline, fault injection, real Recovery, ablation, and negative-case denominators separate (`47 passed`).
 
 ## Next
 
@@ -49,3 +50,4 @@
 - Compare the two successful cross-file traces and add a negative cross-file case before making a recovery-rate claim.
 - Add a negative cross-file case where both files change but hidden tests remain failing.
 - Consolidate successful, ablation, and negative cases into one formal evaluation matrix.
+- Expand the formal task set and repeat selected real tasks before making broader recovery claims.

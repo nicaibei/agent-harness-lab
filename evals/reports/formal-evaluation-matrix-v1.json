@@ -1,0 +1,43 @@
+{
+  "generated_at": "2026-11-07T07:42:48.208455+00:00",
+  "definition": {
+    "task_success": "completed=true and final tests_passed=true",
+    "recovery_success": "first test fails, a valid production diff exists, and final test passes",
+    "modified_but_failed": "production diff exists but final hidden tests fail",
+    "no_global_rate": "groups keep separate denominators and are not merged into one success rate"
+  },
+  "groups": {
+    "baseline": {
+      "attempts": 14,
+      "tasks": 10,
+      "successes": 11,
+      "infrastructure_failures": 3,
+      "valid_success_rate": 1.0
+    },
+    "fault_injection": {
+      "cases": 4,
+      "successful_cases": 3,
+      "middleware_retry_cases": 1,
+      "model_correction_cases": 3,
+      "successful_model_corrections": 2,
+      "failed_cases": 1
+    },
+    "real_recovery": {
+      "runs": 9,
+      "final_test_passes": 9,
+      "recovered_after_failure": 5,
+      "edited_before_first_test": 3
+    },
+    "cross_file_ablation": {
+      "variants": 8,
+      "both_files_passed": 2,
+      "partial_or_initial_failed": 6,
+      "matrix_matches_expectation": true
+    },
+    "cross_file_negative": {
+      "cases": 2,
+      "modified_but_failed": 2,
+      "classification_matches_expectation": true
+    }
+  }
+}
