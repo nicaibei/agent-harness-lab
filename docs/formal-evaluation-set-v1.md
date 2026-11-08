@@ -41,8 +41,13 @@
 
 已使用 `--run-offline` 执行 manifest 明确绑定的 8 个本地任务：2 个 Checkpoint 任务和 6 个 Policy 安全任务。结果为 `8/8` 通过，`model_calls=0`；每个任务保留独立 pytest node、退出码和输出摘要。该结果只证明 Harness 离线回归通过，不计入 Baseline 或真实 Recovery 成功率。
 
-## 首次真实模型冒烟运行
+## 真实模型冒烟运行
 
-在单独授权后，仅运行了 train 任务 `calculator-add-floats` 一次。运行 ID 为 `20261108T073634Z-282eb3b6`，`completed=true`、`tests_passed=true`，耗时约 `10.817s`，最终测试为 `5 passed`，生产 diff 只有预期的 `test_calculator.py` 测试增加，事件数为 20，Policy 拒绝数为 0。
+在分别授权后，已运行两个 train 任务，各运行一次：
 
-独立摘要见 [formal-model-calculator-add-floats-v1.json](../evals/reports/formal-model-calculator-add-floats-v1.json)。Provider usage 没有返回可记录的 token/cost，因此 `cost=null`，不能据此计算成本。该结果只是 runner 的 train 冒烟证据，不代表 Baseline 成功率，也不允许外推到 holdout。
+| 任务 | 运行 ID | 最终测试 | diff | 耗时 | 事件数 |
+| --- | --- | --- | ---: | ---: | ---: |
+| `calculator-add-floats` | `20261108T073634Z-282eb3b6` | 5 passed | 287 | 10.817s | 20 |
+| `calculator-subtract-negative` | `20261108T074306Z-583d14dc` | 5 passed | 277 | 10.030s | 18 |
+
+两个任务都只修改了预期的 `test_calculator.py`，没有 Policy 拒绝或执行错误。独立摘要见 [formal-model-calculator-add-floats-v1.json](../evals/reports/formal-model-calculator-add-floats-v1.json) 和 [formal-model-calculator-subtract-negative-v1.json](../evals/reports/formal-model-calculator-subtract-negative-v1.json)。Provider usage 没有返回可记录的 token/cost，因此 `cost=null`，不能据此计算成本或 Baseline 成功率，也不允许外推到 holdout。

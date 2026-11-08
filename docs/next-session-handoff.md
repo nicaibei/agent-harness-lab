@@ -264,7 +264,7 @@ Python 模块已经正确，唯一故意错误是：
 
 离线执行入口已经验证：Checkpoint v1/v2 和 6 个 Policy 安全 node 共 8 个任务，`8/8` 通过，`model_calls=0`。这只是 Harness 回归证据，不计入模型成功率。
 
-首次真实模型冒烟运行已完成：只运行 train 任务 `calculator-add-floats` 一次，运行 ID `20261108T073634Z-282eb3b6`，最终 `5 passed`，耗时约 `10.817s`，diff 只改测试文件；摘要为 `evals/reports/formal-model-calculator-add-floats-v1.json`。没有记录 token/cost，因此不能计算成本。
+真实模型冒烟运行已完成两个 train 任务：`calculator-add-floats`（`20261108T073634Z-282eb3b6`，5 passed，10.817s）和 `calculator-subtract-negative`（`20261108T074306Z-583d14dc`，5 passed，10.030s）。两个 diff 都只改预期测试文件；摘要分别为 `evals/reports/formal-model-calculator-add-floats-v1.json` 和 `evals/reports/formal-model-calculator-subtract-negative-v1.json`。没有记录 token/cost，因此不能计算成本。
 
 ## 16. 下一个阶段建议
 

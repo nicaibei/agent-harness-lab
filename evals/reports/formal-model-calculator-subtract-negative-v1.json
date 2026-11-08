@@ -1,0 +1,21 @@
+{
+  "schema_version": "formal-model-result.v1",
+  "task_id": "calculator-subtract-negative",
+  "split": "train",
+  "run_dir": "D:\\langgraph_learning\\agent-harness-lab\\runs\\20261108T074306Z-583d14dc",
+  "run_artifact": "D:\\langgraph_learning\\agent-harness-lab\\runs\\20261108T074306Z-583d14dc\\run.json",
+  "scenario": "baseline",
+  "started_at": "2026-11-08T07:43:03.906999+00:00",
+  "finished_at": "2026-11-08T07:43:13.939928+00:00",
+  "latency_seconds": 10.03,
+  "model_calls_requested": 1,
+  "completed": true,
+  "tests_passed": true,
+  "execution_error": null,
+  "model": "deepseek-flash",
+  "diff_chars": 277,
+  "test_run_count": 1,
+  "event_count": 18,
+  "cost": null,
+  "cost_status": "provider_usage_not_recorded"
+}
