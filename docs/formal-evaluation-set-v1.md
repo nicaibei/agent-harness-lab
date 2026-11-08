@@ -6,6 +6,8 @@
 
 任务清单位于 [formal_tasks.json](../evals/formal_tasks.json)，由 [formal_task_manifest.py](../evals/formal_task_manifest.py) 校验。
 
+离线编排入口是 [formal_runner.py](../evals/formal_runner.py)。运行 `uv run python -m evals.formal_runner` 只生成执行计划，不调用模型；计划中的 `agent_model` 任务需要单独授权后才能执行，`harness_offline` 任务可以直接运行本地回归。
+
 ## 任务组成
 
 当前 v1 有 30 个唯一任务：

@@ -260,7 +260,7 @@ Python 模块已经正确，唯一故意错误是：
 
 已建立 `evals/formal_tasks.json` 和 `evals/formal_task_manifest.py`。当前有 30 个唯一任务：train 16 个，holdout 14 个；覆盖 Baseline、Recovery、跨文件、仓库集成、环境、Runtime 和 Policy 安全 strata。校验器要求 fixture 不跨 train/holdout，所有 evaluator 和预期文件路径存在。说明见 `docs/formal-evaluation-set-v1.md`。
 
-这只是任务清单和 split 冻结，不代表 30 个任务已经用统一 runner 完成真实模型评测。下一步是实现统一 runner，并保持 `run.v1` 产物和独立实验分母。
+这只是任务清单和 split 冻结，不代表 30 个任务已经用统一 runner 完成真实模型评测。已增加 `evals/formal_runner.py`，当前只生成不调用模型的执行计划，并保持 `run.v1` 产物和独立实验分母。
 
 ## 16. 下一个阶段建议
 
