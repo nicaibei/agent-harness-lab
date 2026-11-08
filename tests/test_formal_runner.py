@@ -12,6 +12,9 @@ def test_full_plan_separates_model_and_harness_boundaries() -> None:
     assert plan["execution_mode_counts"] == {"agent_model": 22, "harness_offline": 8}
     assert plan["model_calls_scheduled"] == 22
     assert all("task_id" in task for task in plan["tasks"])
+    assert sum(task["offline_target"] is not None for task in plan["tasks"]) == 8
+    offline_targets = [task["offline_target"] for task in plan["tasks"] if task["offline_target"]]
+    assert len(offline_targets) == len(set(offline_targets))
 
 
 def test_holdout_plan_contains_no_train_tasks() -> None:

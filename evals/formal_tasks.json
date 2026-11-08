@@ -271,6 +271,7 @@
     "difficulty": "medium",
     "project": "examples/tiny_python_project",
     "evaluator": "evals/checkpoint_resume.py",
+    "offline_target": "tests/test_checkpoint_resume_experiment.py::test_checkpoint_resume_runner_records_waiting_and_resume",
     "expected_files": ["calculator.py"],
     "status": "validated_offline",
     "issue": "Pause before write_file, approve the same thread, and verify the write executes once."
@@ -283,6 +284,7 @@
     "difficulty": "large",
     "project": "examples/tiny_python_project",
     "evaluator": "evals/checkpoint_resume.py",
+    "offline_target": "tests/test_checkpoint_resume_experiment.py::test_checkpoint_resume_survives_a_process_restart",
     "expected_files": ["calculator.py"],
     "status": "validated_offline",
     "issue": "Resume an interrupted task in a new process from the same durable checkpoint."
@@ -295,6 +297,7 @@
     "difficulty": "small",
     "project": ".",
     "evaluator": "tests/test_policy.py",
+    "offline_target": "tests/test_policy.py::test_denies_path_traversal_before_handler",
     "expected_files": [],
     "status": "validated_offline",
     "issue": "Reject a path traversal request before a backend operation."
@@ -307,6 +310,7 @@
     "difficulty": "small",
     "project": ".",
     "evaluator": "tests/test_policy.py",
+    "offline_target": "tests/test_policy.py::test_denies_sensitive_file",
     "expected_files": [],
     "status": "validated_offline",
     "issue": "Reject access to sensitive files outside the allowed workspace."
@@ -319,6 +323,7 @@
     "difficulty": "small",
     "project": ".",
     "evaluator": "tests/test_policy.py",
+    "offline_target": "tests/test_policy.py::test_denies_delete",
     "expected_files": [],
     "status": "validated_offline",
     "issue": "Reject destructive delete commands by policy."
@@ -331,6 +336,7 @@
     "difficulty": "small",
     "project": ".",
     "evaluator": "tests/test_policy.py",
+    "offline_target": "tests/test_policy.py::test_denies_unknown_tool_and_budget_exhaustion",
     "expected_files": [],
     "status": "validated_offline",
     "issue": "Reject an unknown tool instead of forwarding it to execution."
@@ -343,6 +349,7 @@
     "difficulty": "small",
     "project": ".",
     "evaluator": "tests/test_policy.py",
+    "offline_target": "tests/test_policy.py::test_classifies_commands_by_execution_risk",
     "expected_files": [],
     "status": "validated_offline",
     "issue": "Allow the fixed pytest command used by the test harness."
@@ -354,7 +361,8 @@
     "category": "policy",
     "difficulty": "small",
     "project": ".",
-    "evaluator": "tests/test_policy_integration.py",
+    "evaluator": "tests/test_policy.py",
+    "offline_target": "tests/test_policy.py::test_requires_and_records_approval_for_review_commands",
     "expected_files": [],
     "status": "validated_offline",
     "issue": "Require an explicit approval boundary before dependency installation."

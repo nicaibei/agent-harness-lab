@@ -21,3 +21,8 @@ def test_formal_manifest_has_30_unique_leak_free_tasks() -> None:
     train_projects = {task.project for task in tasks if task.split == "train"}
     holdout_projects = {task.project for task in tasks if task.split == "holdout"}
     assert train_projects.isdisjoint(holdout_projects)
+    assert all(
+        task.offline_target is not None
+        for task in tasks
+        if task.strata in {"runtime", "security"}
+    )

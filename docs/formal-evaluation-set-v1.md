@@ -6,7 +6,7 @@
 
 任务清单位于 [formal_tasks.json](../evals/formal_tasks.json)，由 [formal_task_manifest.py](../evals/formal_task_manifest.py) 校验。
 
-离线编排入口是 [formal_runner.py](../evals/formal_runner.py)。运行 `uv run python -m evals.formal_runner` 只生成执行计划，不调用模型；计划中的 `agent_model` 任务需要单独授权后才能执行，`harness_offline` 任务可以直接运行本地回归。
+离线编排入口是 [formal_runner.py](../evals/formal_runner.py)。运行 `uv run python -m evals.formal_runner` 只生成执行计划，不调用模型；运行 `uv run python -m evals.formal_runner --run-offline` 只执行 manifest 明确绑定的 8 个本地 pytest node，模型调用数固定为 0。计划中的 `agent_model` 任务需要单独授权后才能执行。
 
 ## 任务组成
 
@@ -36,3 +36,7 @@
 - 目前还没有用统一 runner 对 30 个任务跑出同一批次的可比模型指标。
 
 因此本文件完成的是“任务集和 split 冻结”，不是最终评测报告。下一步应实现统一 manifest runner，在不改变 split 的前提下分别运行 Baseline、Policy/Recovery 增强版本，并记录成本、延迟、工具调用次数和 `run.v1` 产物。
+
+## Harness 离线基线
+
+已使用 `--run-offline` 执行 manifest 明确绑定的 8 个本地任务：2 个 Checkpoint 任务和 6 个 Policy 安全任务。结果为 `8/8` 通过，`model_calls=0`；每个任务保留独立 pytest node、退出码和输出摘要。该结果只证明 Harness 离线回归通过，不计入 Baseline 或真实 Recovery 成功率。

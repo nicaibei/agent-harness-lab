@@ -48,13 +48,20 @@ def test_denies_path_traversal_before_handler() -> None:
     assert called is False
 
 
-def test_denies_sensitive_file_and_delete() -> None:
+def test_denies_sensitive_file() -> None:
     policy = PolicyMiddleware()
 
     secret = policy.wrap_tool_call(_request("read_file", {"file_path": "/.env"}), _handler)
-    delete = policy.wrap_tool_call(_request("delete", {"file_path": "/calculator.py"}), _handler)
 
     assert isinstance(secret, ToolMessage) and secret.status == "error"
+
+
+def test_denies_delete() -> None:
+    delete = PolicyMiddleware().wrap_tool_call(
+        _request("delete", {"file_path": "/calculator.py"}),
+        _handler,
+    )
+
     assert isinstance(delete, ToolMessage) and delete.status == "error"
 
 

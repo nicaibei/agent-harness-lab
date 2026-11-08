@@ -28,6 +28,7 @@ class FormalTaskSpec:
     difficulty: str
     project: str
     evaluator: str
+    offline_target: str | None
     expected_files: tuple[str, ...]
     status: str
     issue: str
@@ -94,8 +95,14 @@ def load_manifest(
             raise ValueError(f"Unknown formal task strata: {strata}")
         project = _required_string(item, "project")
         evaluator = _required_string(item, "evaluator")
+        offline_target = item.get("offline_target")
+        if offline_target is not None and not isinstance(offline_target, str):
+            raise ValueError(f"Formal task {task_id} offline_target must be a string")
         _relative_path(root, project, "project")
         _relative_path(root, evaluator, "evaluator")
+        if offline_target is not None:
+            target_path = offline_target.split("::", maxsplit=1)[0]
+            _relative_path(root, target_path, "offline_target")
         expected_files = _validate_expected_files(root, project, item, task_id)
         status = _required_string(item, "status")
         if status not in ALLOWED_STATUSES:
@@ -110,6 +117,7 @@ def load_manifest(
                 difficulty=_required_string(item, "difficulty"),
                 project=project,
                 evaluator=evaluator,
+                offline_target=offline_target,
                 expected_files=expected_files,
                 status=status,
                 issue=_required_string(item, "issue"),
