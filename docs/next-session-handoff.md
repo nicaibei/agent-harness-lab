@@ -230,7 +230,25 @@ Python 模块已经正确，唯一故意错误是：
 
 用户随后授权完成一次真实运行：首次测试识别 dependency_conflict，Agent 调用受限 prepare_dependency 切换到固定 2.0.0，第二次测试 3 passed，completed=true、tests_passed=true、outcome=environment_recovered、environment_prepared=true、生产 diff 为 0 字符。运行 ID：20261108T051319Z-bffefc3d。独立报告：evals/reports/real-recovery-dependency-version-conflict.md。该结果不计入正式代码 Recovery 成功率。
 
-## 11. 下一个阶段建议
+## 11. 最近完成的 Checkpoint / Interrupt / Resume 离线实验
+
+实验名称：Checkpoint / Interrupt / Resume v1，任务 ID：checkpoint-resume-v1。
+
+在写文件之前配置 interrupt_on，第一次运行进入 waiting，暂停前没有生产 diff；使用同一个 thread_id resume 后，write_file 执行一次，测试通过，checkpoint 从 4 增加到 12，replay 记录 waiting、resumed、test_run 和 finished。运行 ID：20261108T053319Z-69a171fa。
+
+实验说明：docs/checkpoint-resume-v1.md。该实验使用 Fake Model，没有调用 DeepSeek，也没有加入模型成功率。
+
+## 12. 最近完成的 Checkpoint 跨进程恢复实验
+
+实验名称：Checkpoint / Interrupt / Resume v2，任务 ID：checkpoint-resume-v2-process-restart。
+
+当前环境没有 SQLite 或 Postgres Checkpointer，因此新增了不依赖第三方包的 FileCheckpointSaver。pause 进程在 write_file 前中断并退出，resume 进程重新创建 Agent、读取同一份 checkpoint-store.json，再使用相同 thread_id 恢复。
+
+离线结果：运行 ID 为 20261108T061342Z-d7821869，paused=true、resumed=true、暂停前无副作用、checkpoint 从 4 增加到 12、最终测试通过，replay 记录 process_restarted、run_resumed、test_run 和 run_finished。实验使用 Fake Model，没有调用 DeepSeek。全量测试为 71 passed。
+
+实验说明：docs/checkpoint-resume-v2.md。跨进程回归测试已经加入。
+
+## 13. 下一个阶段建议
 
 下一步独立实验建议做“允许离线安装依赖”或“版本冲突 Recovery v1”，不要把它和本次环境停止实验合并。应按以下顺序：
 
@@ -245,7 +263,7 @@ Python 模块已经正确，唯一故意错误是：
 
 当前不要把第三方依赖错误与配置错误或包导入错误混在同一个 fixture 中，否则无法判断模型修复了哪一类失败。
 
-## 12. 下一个对话的开场提示
+## 14. 下一个对话的开场提示
 
 可以直接把下面这句话发给下一个对话：
 
