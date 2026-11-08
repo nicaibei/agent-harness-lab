@@ -38,6 +38,29 @@ Deep Agents
 
 因此，看到一个默认能力时，要问它是在 create_deep_agent 的哪一步接入的；看到执行或恢复能力时，再确认它由哪个运行时或后端负责。
 
+## `create_deep_agent()` 实际组装链
+
+基于当前 Deep Agents 源码 checkout，关键符号之间的调用关系是：
+
+~~~text
+create_deep_agent()
+  -> resolve_model() / _harness_profile_for_model()
+  -> 默认 backend：StateBackend()
+  -> FilesystemMiddleware(backend, permissions)
+  -> SubAgentMiddleware / AsyncSubAgentMiddleware（按 subagents 配置）
+  -> SummarizationMiddleware + PatchToolCallsMiddleware
+  -> SkillsMiddleware / MemoryMiddleware / HumanInTheLoopMiddleware（按参数）
+  -> _apply_excluded_middleware() / _apply_custom_middleware()
+  -> langchain.agents.create_agent(
+       model, tools, middleware, state_schema, context_schema,
+       checkpointer, store, debug, name, cache,
+     )
+~~~
+
+这里的关键边界是：`create_deep_agent()` 负责组装和配置，`create_agent()` 负责把模型、工具和 middleware 交给 LangGraph 图运行时；它本身不实现某个文件 backend，也不负责把 checkpoint 内容序列化到具体数据库。
+
+源码证据入口：`libs/deepagents/deepagents/graph.py` 的 `create_deep_agent()`、`deepagents/middleware/filesystem.py` 的 `FilesystemMiddleware._create_tools()` 与 `wrap_model_call()`、以及 `deepagents/backends/protocol.py` 的 `BackendProtocol` 和 `SandboxBackendProtocol`。
+
 ## 一次运行的执行链路
 
 下面是概念链路；具体 hook 顺序由当前 middleware 组合和 LangChain Agent 实现决定。

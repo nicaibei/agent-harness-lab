@@ -2,6 +2,31 @@
 
 这份笔记把“看过几个文件”变成一条可重复的源码追踪路线。目标不是背实现细节，而是能从公开入口解释：能力在哪里组装、运行时如何调用、具体实现在哪里落地。
 
+源码证据基于 `D:\langgraph_learning\deepagent` 当前 checkout，阅读对象是 `libs/deepagents`。仓库版本变化时，应重新核对下面的符号和 middleware 顺序；这里记录的是职责和调用边界，不把行号当成公共 API。
+
+## 本次源码核对结果
+
+| 结论 | 源码证据 | 对 Harness 设计的影响 |
+|---|---|---|
+| Agent 组装入口是 `create_deep_agent()` | `deepagents/graph.py`：解析 model/profile/backend，组装 middleware，最后调用 `create_agent()` | Policy、Recovery 和运行配置应作为 middleware 或 graph 参数接入 |
+| 文件工具由 middleware 暴露 | `deepagents/middleware/filesystem.py`：`FilesystemMiddleware._create_tools()`、`wrap_model_call()` | 工具可见性、参数和权限在 middleware 边界控制 |
+| 文件实际存储由 backend 决定 | `deepagents/backends/protocol.py`：`BackendProtocol` 的读写契约；State/Filesystem/Store 实现不同生命周期 | 不能把工具权限误认为 backend 或操作系统沙箱 |
+| `execute` 是能力接口，不是安全保证 | `SandboxBackendProtocol` 与 `FilesystemMiddleware` 的 `supports_execution()` | 需要单独验证执行环境、命令策略和人工审批 |
+| Checkpoint 与文件存储分离 | `create_deep_agent()` 将 `checkpointer` 传入 `create_agent()`；backend 另行处理文件 | Interrupt/Resume 和文件持久化必须分别测试 |
+
+### 组装顺序的最小证据链
+
+```text
+create_deep_agent
+  -> FilesystemMiddleware(backend=...)
+  -> SubAgent/Summarization/PatchToolCalls middleware
+  -> Skills/Memory/HumanInTheLoop（按配置）
+  -> 自定义 middleware 插入和排除规则
+  -> create_agent(..., checkpointer=..., store=...)
+```
+
+这条链解释了为什么本项目把 Policy、Recovery、Checkpoint 和 Replay 放在 Harness 层：它们跨越多个工具调用或图步骤，不能可靠地塞进单个业务工具。
+
 ## 阅读路线
 
 按下面顺序读，每个文件先看入口和类型，再按关键符号跳转，不需要从第一行顺序读到最后一行。
@@ -126,10 +151,10 @@ create_deep_agent()
 
 ## 读完后的验收清单
 
-- [ ] 能用一分钟解释三层架构。
-- [ ] 能从 create_deep_agent 追到 create_agent。
-- [ ] 能说明 middleware、tool、backend 的职责边界。
-- [ ] 能说出至少三类 backend 的数据位置、生命周期和主要限制。
-- [ ] 能解释 checkpointer 与 Store 或 backend 的区别。
-- [ ] 能指出 LocalShellBackend 不提供安全隔离。
-- [ ] 能从一个公开行为定位到相应源码和测试。
+- [x] 能用一分钟解释三层架构。
+- [x] 能从 create_deep_agent 追到 create_agent。
+- [x] 能说明 middleware、tool、backend 的职责边界。
+- [x] 能说出至少三类 backend 的数据位置、生命周期和主要限制。
+- [x] 能解释 checkpointer 与 Store 或 backend 的区别。
+- [x] 能指出 LocalShellBackend 不提供安全隔离。
+- [x] 能从一个公开行为定位到相应源码和测试。

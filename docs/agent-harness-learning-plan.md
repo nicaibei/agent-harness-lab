@@ -151,10 +151,10 @@
 
 ### 2026-11-08 至 2026-11-15
 
-- [ ] 完成 docs/architecture.md；
-- [ ] 完成 docs/source-notes.md；
-- [ ] 画出 create_deep_agent() 调用链；
-- [ ] 复盘配置与启动 Recovery；
+- [x] 完成 docs/architecture.md；
+- [x] 完成 docs/source-notes.md；
+- [x] 画出 create_deep_agent() 调用链；
+- [x] 复盘配置与启动 Recovery；
 - [ ] 检查启动 Recovery 改动、测试和报告；
 - [ ] 暂不启动新的真实 DeepSeek 调用。
 
