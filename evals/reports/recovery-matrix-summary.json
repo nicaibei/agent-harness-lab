@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-11-07T10:03:14.060434+00:00",
+  "generated_at": "2026-11-07T10:37:37.983368+00:00",
   "runs_directory": "runs\\recovery",
-  "run_count": 21,
-  "successful_runs": 21,
-  "recovered_after_failure": 17,
+  "run_count": 24,
+  "successful_runs": 24,
+  "recovered_after_failure": 20,
   "edited_before_first_test": 3,
   "runs": [
     {
@@ -404,6 +404,63 @@
       "test_recovery_failures": 0,
       "recovery_terminals": 1,
       "diff_chars": 136
+    },
+    {
+      "run_id": "20261107T102823Z-e6225779",
+      "task_id": "real-recovery-startup-import",
+      "model": "deepseek-flash",
+      "baseline_gate": true,
+      "completed": true,
+      "tests_passed": true,
+      "test_run_count": 2,
+      "first_test_passed": false,
+      "last_test_passed": true,
+      "test_failure_results": 1,
+      "recovered_after_failure": true,
+      "edited_before_first_test": false,
+      "policy_denials": 1,
+      "recovery_failures": 0,
+      "test_recovery_failures": 0,
+      "recovery_terminals": 0,
+      "diff_chars": 304
+    },
+    {
+      "run_id": "20261107T103524Z-1109cb1b",
+      "task_id": "real-recovery-startup-import",
+      "model": "deepseek-flash",
+      "baseline_gate": true,
+      "completed": true,
+      "tests_passed": true,
+      "test_run_count": 2,
+      "first_test_passed": false,
+      "last_test_passed": true,
+      "test_failure_results": 1,
+      "recovered_after_failure": true,
+      "edited_before_first_test": false,
+      "policy_denials": 1,
+      "recovery_failures": 1,
+      "test_recovery_failures": 0,
+      "recovery_terminals": 1,
+      "diff_chars": 304
+    },
+    {
+      "run_id": "20261107T103640Z-ee3b3b33",
+      "task_id": "real-recovery-startup-import",
+      "model": "deepseek-flash",
+      "baseline_gate": true,
+      "completed": true,
+      "tests_passed": true,
+      "test_run_count": 2,
+      "first_test_passed": false,
+      "last_test_passed": true,
+      "test_failure_results": 1,
+      "recovered_after_failure": true,
+      "edited_before_first_test": false,
+      "policy_denials": 1,
+      "recovery_failures": 1,
+      "test_recovery_failures": 0,
+      "recovery_terminals": 1,
+      "diff_chars": 304
     }
   ]
 }

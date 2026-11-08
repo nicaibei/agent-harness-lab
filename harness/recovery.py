@@ -12,25 +12,40 @@ from langchain_core.messages import ToolMessage
 from langgraph.types import Command
 
 
-FailureCategory = Literal["transient", "policy", "budget", "tool_error", "exception"]
+FailureCategory = Literal[
+    "transient",
+    "environment",
+    "dependency_conflict",
+    "policy",
+    "budget",
+    "tool_error",
+    "exception",
+]
 _TRANSIENT_MARKERS = ("timeout", "timed out", "temporarily", "connection reset", "unavailable")
 
 
 def classify_failure(value: object) -> FailureCategory | None:
     """Classify a tool exception or error message for recovery decisions."""
     if isinstance(value, str):
-        text = value[:500].casefold()
+        raw_text = value
+        text = raw_text[:500].casefold()
         if any(marker in text for marker in _TRANSIENT_MARKERS):
             return "transient"
         try:
-            payload = json.loads(text)
+            payload = json.loads(raw_text)
         except json.JSONDecodeError:
             payload = None
+        if isinstance(payload, dict) and payload.get("failure_class") in {
+            "environment",
+            "dependency_conflict",
+        }:
+            return payload["failure_class"]
         if isinstance(payload, dict) and payload.get("success") is False:
             return "tool_error"
         return None
     if isinstance(value, ToolMessage):
-        text = _message_text(value.content).casefold()
+        raw_text = value.content if isinstance(value.content, str) else _message_text(value.content)
+        text = raw_text[:500].casefold()
         if "policy denied" in text:
             return "policy"
         if "budget exhausted" in text:
@@ -38,9 +53,14 @@ def classify_failure(value: object) -> FailureCategory | None:
         if any(marker in text for marker in _TRANSIENT_MARKERS):
             return "transient"
         try:
-            payload = json.loads(text)
+            payload = json.loads(raw_text)
         except json.JSONDecodeError:
             payload = None
+        if isinstance(payload, dict) and payload.get("failure_class") in {
+            "environment",
+            "dependency_conflict",
+        }:
+            return payload["failure_class"]
         if isinstance(payload, dict) and payload.get("success") is False:
             return "tool_error"
         if value.status != "error":

@@ -1,0 +1,19 @@
+{
+  "task_id": "real-recovery-dependency-version-conflict",
+  "run_id": "20261108T051319Z-bffefc3d",
+  "experiment_group": "environment_preparation",
+  "completed": true,
+  "tests_passed": true,
+  "outcome": "environment_recovered",
+  "environment_blocked": false,
+  "environment_prepared": true,
+  "test_failure_classes": [
+    "dependency_conflict"
+  ],
+  "hidden_test_runs": 2,
+  "model_calls": 1,
+  "production_diff_characters": 0,
+  "execution_error": null,
+  "environment_recovery_success": true,
+  "counts_in_formal_code_recovery_success_rate": false
+}

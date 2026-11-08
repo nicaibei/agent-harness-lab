@@ -1,0 +1,7 @@
+[project]
+name = "dependency-conflict-fixture"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "agent-harness-lab-conflict-dependency==2.0.0",
+]

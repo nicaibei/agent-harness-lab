@@ -31,6 +31,7 @@ from evals.real_recovery import (
     UNIQUE_PROJECT,
     RECOVERY_CASES,
     RECOVERY_PROJECT,
+    _parse_test_runs,
     _run_hidden_tests,
 )
 from evals.real_recovery import _create_hidden_test_tool
@@ -250,6 +251,18 @@ def test_recovery_task_defaults_to_baseline_gate() -> None:
     from evals.real_recovery import run_recovery_task
 
     assert signature(run_recovery_task).parameters["baseline_gate"].default is True
+
+
+def test_parse_test_runs_records_malformed_tool_messages() -> None:
+    errors: list[dict[str, str]] = []
+
+    parsed = _parse_test_runs(
+        ["not-json", '{"success": false}', '{"success": true}'],
+        on_error=errors.append,
+    )
+
+    assert parsed == [{"success": False}, {"success": True}]
+    assert errors[0]["content_preview"] == "not-json"
 
 
 def test_baseline_gate_forces_hidden_failure_before_real_fix(tmp_path: Path) -> None:

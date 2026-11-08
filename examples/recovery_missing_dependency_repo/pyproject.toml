@@ -1,0 +1,7 @@
+[project]
+name = "dependency-missing-fixture"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "agent-harness-lab-missing-dependency==1.0.0",
+]

@@ -24,6 +24,17 @@ git -c safe.directory=D:/langgraph_learning/agent-harness-lab push origin main
 
 用户是初学者，项目目标是理解 Agent Harness，而不是只让模型完成代码任务。每次新实验必须遵守下面的流程：
 
+### 个人教学和协作偏好
+
+- 这是一个学习过程，不是把所有工作交给 Agent 后只看最终文件。每完成一部分，都要说明做了什么、为什么做、修改了什么，以及这一步能学到什么。
+- 用户的设计经验还不多，所以主要设计由助手负责；用户提出的理解和方案需要被认真评价，明确指出正确、部分正确或错误，再给出完整标准答案。
+- 不要一开始就埋头写代码。先讲概念和目标，再说明这一步属于 Baseline、Policy、Recovery、Replay 还是评测设计。
+- 在写代码前让用户做一次设计判断，例如判断失败模式、控制变量、成功标准和证据边界；用户回答后再继续实现。
+- 实现完成后要逐段解释关键类、方法、调用链、测试和运行结果，尤其解释 `run.json`、`diff.patch`、首次测试和最终测试之间的关系。
+- 每个阶段安排一个小练习，例如修改一个规则、补一个测试或分析一条运行日志；不要只给结论。
+- GitHub 提交代表用户已经理解这阶段内容。必须完成复盘并确认用户能解释主要结果后，才进入 commit/push。
+- 实验开始前和结束后都要解释，不能只报告“成功”或“测试通过”。
+
 1. 实验开始前说明目的、要研究的失败模式、故意设置的错误、Agent 应如何处理、控制变量、成功标准、是否调用 DeepSeek、是否消耗额度、是否需要租服务器。
 2. 代码实施前让用户先表达设计理解；用户的回答无论正确、部分正确还是错误，都要给出完整标准答案和修正点。
 3. 实验完成后解释实际发生了什么、修改了什么、首次和最终测试、Policy/Recovery 做了什么、能证明什么、不能证明什么，以及用户学到了什么。
@@ -69,7 +80,7 @@ git -c safe.directory=D:/langgraph_learning/agent-harness-lab push origin main
 | --- | --- | --- |
 | Baseline | 14 次尝试、10 个任务、11 次成功、3 次基础设施失败 | 有效尝试成功率 100%；基础设施失败不能算模型代码失败 |
 | 故障注入 | 4 个案例，3 个成功，1 个失败 | Middleware 重试和模型纠错已能区分 |
-| 真实 Recovery | 21 次运行，21 次最终通过，17 次失败后恢复 | 最终通过不等于所有运行都发生了 Recovery |
+| 真实 Recovery | 24 次运行，24 次最终通过，20 次失败后恢复 | 最终通过不等于所有运行都发生了 Recovery |
 | 跨文件消融 | 8 个变体，双文件都通过 2 个 | 证明跨文件任务必须同时修复相关文件 |
 | 跨文件负面 | 2 个修改但最终失败 | 证明 diff 存在不等于修复正确 |
 
@@ -138,12 +149,28 @@ Python 模块已经正确，唯一故意错误是：
 
 这只能说明当前受控任务在当前模型配置下表现出初步稳定性，不能推断其他配置格式、复杂依赖或大型真实仓库的总体成功率。
 
-## 6. 最近测试和 Git 状态
+## 6. 最近完成的项目启动错误实验
+
+实验名称：项目启动错误 Recovery v1，任务 ID：`real-recovery-startup-import`。
+
+新增 fixture：`examples/recovery_startup_repo/`。唯一故障是 `service_app/__init__.py` 导入不存在的 `service_app.configs`；正确模块是 `service_app.config`。`config.py`、`app.py` 和 `__main__.py` 都是正确的，隐藏测试在 workspace 外。
+
+一次真实运行和两次有效重复都满足：首次 `2 failed, 1 passed`，最终 `3 passed`，只修改 `service_app/__init__.py`，三次 diff 都是 304 字符。有效运行 ID：
+
+- `20261107T102823Z-e6225779`
+- `20261107T103524Z-1109cb1b`
+- `20261107T103640Z-ee3b3b33`
+
+第一次重复调用 `20261107T103219Z-e6a6e914` 暴露了 Harness 缺陷：`real_recovery.py` 直接对每条 `run_tests` 消息执行 `json.loads`，非 JSON 消息导致报告保存前崩溃。现在已增加 `_parse_test_runs` 容错解析和离线回归测试；这次 Harness 失败不计入模型 Recovery 失败。
+
+实验文档：`docs/startup-recovery-v1.md`；重复报告：`evals/reports/repeat-real-recovery-startup-import.md`。
+
+## 7. 最近测试和 Git 状态
 
 最近全量测试：
 
 ```text
-56 passed
+57 passed
 ```
 
 另有一个 `PytestCacheWarning`，原因是当前 Windows 环境无法写入 `.pytest_cache`；不是测试失败，也没有改变测试结论。
@@ -154,25 +181,72 @@ Python 模块已经正确，唯一故意错误是：
 2b4b0b3 feat(evals): add configuration recovery experiment
 ```
 
-该提交包含配置 fixture、离线测试、真实运行报告、重复报告、正式矩阵更新和实验文档。它已经在本地 commit，但还没有推送到 GitHub。本交接文档会作为单独的 docs 提交保存。
+该提交包含配置 fixture、离线测试、真实运行报告、重复报告、正式矩阵更新和实验文档。它已经在本地 commit，但还没有推送到 GitHub。本交接文档也已本地提交；启动错误 fixture、解析容错修复和最新报告目前仍是未提交改动。
 
-## 7. 下一个阶段建议
+## 8. 最近完成的依赖环境实验
 
-下一个独立实验建议做“包级依赖或项目启动错误 Recovery v1”，但不要直接开始真实调用。应按以下顺序：
+实验名称：第三方依赖环境错误 Recovery v1，任务 ID：real-recovery-missing-dependency。
 
-1. 先说明这个实验要区分配置错误、业务逻辑错误和依赖/启动错误；
-2. 设计一个小型、可控、离线可复现的 fixture；
+本阶段选择“环境失败即停止”，不研究依赖安装能力。新增 fixture 声明一个执行环境中不存在的第三方包，隐藏测试输出 ENVIRONMENT_FAILURE 标记。Harness 现在会：
+
+- 将结构化结果分类为 failure_class=environment；
+- 让 Recovery 记录环境失败并停止重试；
+- 让 Policy 在环境失败后拒绝 write_file、edit_file 和 delete；
+- 在运行报告中保存 outcome、environment_blocked 和 test_failure_classes。
+
+离线结果：
+
+- 外部隐藏测试：2 passed, 1 failed；
+- _run_hidden_tests 正确返回 failure_class=environment；
+- 环境失败后的文件修改拒绝回归通过；
+- 全量测试：62 passed，只有 Windows .pytest_cache 写入警告；
+- 离线阶段没有调用 DeepSeek，也不需要服务器。
+
+实验说明：docs/dependency-environment-v1.md。随后在用户授权下完成一次真实运行：completed=true、tests_passed=false、outcome=environment_blocked、environment_blocked=true、生产 diff 为 0 字符。该运行证明 Agent 遵守了环境失败停止边界，不计入正式 Recovery 成功率。
+
+真实运行 ID：20261108T041536Z-8ac3139d。独立报告：evals/reports/real-recovery-missing-dependency.md。事后修正了真实运行器的 Middleware 顺序并增加离线回归，没有重复调用模型。
+
+## 9. 最近完成的受控依赖准备实验
+
+实验名称：受控离线依赖准备 Recovery v1，任务 ID：real-recovery-missing-dependency-install。
+
+离线阶段完成了固定 wheel、受限 prepare_dependency 工具、Policy 前置失败门槛和 Agent 图级回归。全量测试为 65 passed。
+
+随后在用户授权下完成一次真实运行：首次环境失败后调用受限准备工具，第二次隐藏测试 3 passed，completed=true、tests_passed=true、outcome=environment_recovered、environment_prepared=true、生产 diff 为 0 字符。
+
+真实运行 ID：20261108T044830Z-057a2535。独立报告：evals/reports/real-recovery-missing-dependency-install.md。该结果是环境恢复成功，不计入正式代码 Recovery 成功率。
+
+事后发现长 pytest JSON 被截断导致 Recovery 分类事件不完整，已修复完整结构化解析并增加离线回归，没有重复调用模型。
+
+## 10. 最近完成的版本冲突离线实验
+
+实验名称：单包精确版本冲突 Recovery v1，任务 ID：real-recovery-dependency-version-conflict。
+
+设计为环境预加载 1.0.0、项目要求 2.0.0，Harness 只允许使用预置的 2.0.0 wheel。离线阶段没有调用模型。
+
+全量测试为 69 passed，针对性 Agent 图回归为 4 passed。首次冲突能分类为 dependency_conflict，受限工具替换后最终测试通过，生产 diff 为空。
+
+实验说明：docs/dependency-conflict-v1.md。真实模型运行尚未开始，也没有把该实验加入正式 Recovery 成功率。
+
+用户随后授权完成一次真实运行：首次测试识别 dependency_conflict，Agent 调用受限 prepare_dependency 切换到固定 2.0.0，第二次测试 3 passed，completed=true、tests_passed=true、outcome=environment_recovered、environment_prepared=true、生产 diff 为 0 字符。运行 ID：20261108T051319Z-bffefc3d。独立报告：evals/reports/real-recovery-dependency-version-conflict.md。该结果不计入正式代码 Recovery 成功率。
+
+## 11. 下一个阶段建议
+
+下一步独立实验建议做“允许离线安装依赖”或“版本冲突 Recovery v1”，不要把它和本次环境停止实验合并。应按以下顺序：
+
+1. 先说明这个实验要区分业务逻辑错误、包启动错误和依赖/环境错误；
+2. 设计一个提供本地 wheel 或受控版本集合的离线 fixture；
 3. 明确依赖安装是否属于 Agent 能力，还是 Harness 的环境准备能力；
-4. 先验证离线首次失败、修复后通过和错误分类；
+4. 先验证离线安装、错误分类和安全边界；
 5. 解释离线结果后，再单独请求一次 DeepSeek 真实运行授权；
 6. 真实运行后读取 `run.json` 和 `diff.patch`，检查是否发生了正确的恢复；
 7. 必要时重复运行，最后更新矩阵和文档；
 8. 完成复盘后再提醒是否适合下一次 GitHub 提交。
 
-当前不要把“包级依赖错误”与“配置错误”混在同一个 fixture 中，否则无法判断模型修复了哪一类失败。
+当前不要把第三方依赖错误与配置错误或包导入错误混在同一个 fixture 中，否则无法判断模型修复了哪一类失败。
 
-## 8. 下一个对话的开场提示
+## 12. 下一个对话的开场提示
 
 可以直接把下面这句话发给下一个对话：
 
-> 请先阅读 `docs/next-session-handoff.md`。我们在 `D:\langgraph_learning\agent-harness-lab` 上做 Agent Harness 学习实验。先检查功能提交 `2b4b0b3` 和交接文档提交是否已经推送；如果网络恢复，先推送本地提交。然后不要直接调用模型，先按交接文档解释下一步“包级依赖或项目启动错误 Recovery v1”的实验目的、失败模式、控制变量、成功标准和是否需要服务器，再等我确认。
+> 请先阅读 docs/next-session-handoff.md。我们在 D:/langgraph_learning/agent-harness-lab 上做 Agent Harness 学习实验。先检查本地提交和未提交的实验改动，复盘启动 Recovery 和第三方依赖环境停止实验，再解释下一步允许离线安装依赖或版本冲突 Recovery v1 的目的、失败模式、控制变量、成功标准和是否需要服务器；新的真实模型调用必须先请求单独授权。

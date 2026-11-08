@@ -1,0 +1,18 @@
+{
+  "task_id": "real-recovery-missing-dependency",
+  "run_id": "20261108T041536Z-8ac3139d",
+  "experiment_group": "environment_blocked",
+  "completed": true,
+  "tests_passed": false,
+  "outcome": "environment_blocked",
+  "environment_blocked": true,
+  "test_failure_classes": [
+    "environment"
+  ],
+  "hidden_test_runs": 1,
+  "model_calls": 1,
+  "production_diff_characters": 0,
+  "execution_error": null,
+  "counts_as_recovery_success": false,
+  "counts_in_formal_recovery_success_rate": false
+}

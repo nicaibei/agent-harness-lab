@@ -1,8 +1,8 @@
 # Real Recovery 矩阵汇总
 
-- 运行数：21
-- 最终测试通过：21
-- 失败后恢复成功：17
+- 运行数：24
+- 最终测试通过：24
+- 失败后恢复成功：20
 
 | 任务 | 基线门 | 首次测试 | 最后测试 | 失败后恢复 | Policy 拒绝 | 测试失败结果 | 测试 Recovery 事件 | diff |
 | --- | --- | --- | --- | --- | ---: | ---: | ---: | ---: |
@@ -27,3 +27,6 @@
 | `real-recovery-inventory-config` | True | False | True | True | 0 | 1 | 0 | 136 |
 | `real-recovery-inventory-config` | True | False | True | True | 0 | 1 | 0 | 136 |
 | `real-recovery-inventory-config` | True | False | True | True | 0 | 1 | 0 | 136 |
+| `real-recovery-startup-import` | True | False | True | True | 1 | 1 | 0 | 304 |
+| `real-recovery-startup-import` | True | False | True | True | 1 | 1 | 0 | 304 |
+| `real-recovery-startup-import` | True | False | True | True | 1 | 1 | 0 | 304 |

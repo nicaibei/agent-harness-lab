@@ -98,5 +98,17 @@
     "repeat_target": 3,
     "status": "real_validated_once",
     "issue": "Repair the incorrect fractional tax rate in the repository configuration without changing the already-correct Python modules."
+  },
+  {
+    "id": "real-recovery-startup-import",
+    "case": "startup-import",
+    "category": "repository_integration",
+    "difficulty": "medium",
+    "project": "examples/recovery_startup_repo",
+    "hidden_tests": "evals/hidden_tests/test_startup_repo.py",
+    "expected_files": ["service_app/__init__.py"],
+    "repeat_target": 3,
+    "status": "real_validated_once",
+    "issue": "Repair the package import and module entrypoint without changing the valid application modules or hidden tests."
   }
 ]

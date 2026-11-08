@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import fnmatch
+import json
 import shlex
 from collections.abc import Callable
 from pathlib import PurePosixPath
@@ -25,6 +26,7 @@ DEFAULT_ALLOWED_TOOLS = frozenset(
         "delete",
         "run_command",
         "run_tests",
+        "prepare_dependency",
         "write_todos",
     }
 )
@@ -32,6 +34,7 @@ PATH_TOOLS = frozenset({"ls", "read_file", "write_file", "edit_file", "glob", "g
 MUTATING_TOOLS = frozenset({"write_file", "edit_file", "delete"})
 SENSITIVE_NAMES = (".env", ".env.*", "*.pem", "*.key", "id_rsa", "credentials*.json")
 COMMAND_TOOLS = frozenset({"run_command"})
+PREPARATION_TOOLS = frozenset({"prepare_dependency"})
 CommandRisk = Literal["safe", "review", "dangerous"]
 _DANGEROUS_COMMANDS = frozenset(
     {"del", "erase", "format", "rm", "rmdir", "shutdown", "taskkill"}
@@ -73,6 +76,7 @@ class PolicyMiddleware(AgentMiddleware):
         on_decision: Callable[[dict[str, Any]], None] | None = None,
         approval_callback: Callable[[dict[str, Any]], bool] | None = None,
         require_baseline_test: bool = False,
+        stop_on_environment_failure: bool = False,
     ) -> None:
         if max_tool_calls < 1:
             raise ValueError("max_tool_calls must be at least 1")
@@ -81,7 +85,11 @@ class PolicyMiddleware(AgentMiddleware):
         self.on_decision = on_decision
         self.approval_callback = approval_callback
         self.require_baseline_test = require_baseline_test
+        self.stop_on_environment_failure = stop_on_environment_failure
         self.baseline_test_completed = False
+        self.environment_failure_detected = False
+        self.dependency_conflict_detected = False
+        self.environment_preparation_completed = False
         self.call_count = 0
 
     def _emit(
@@ -144,6 +152,33 @@ class PolicyMiddleware(AgentMiddleware):
             status="error",
         )
 
+    @staticmethod
+    def _environment_failure_class(result: object) -> str | None:
+        """Return the structured environment failure category, when present."""
+        if not isinstance(result, ToolMessage) or not isinstance(result.content, str):
+            return None
+        try:
+            payload = json.loads(result.content)
+        except json.JSONDecodeError:
+            return None
+        if not isinstance(payload, dict):
+            return None
+        failure_class = payload.get("failure_class")
+        if failure_class in {"environment", "dependency_conflict"}:
+            return failure_class
+        return None
+
+    @staticmethod
+    def _is_environment_prepared(result: object) -> bool:
+        """Detect a successful result from the approved preparation tool."""
+        if not isinstance(result, ToolMessage) or not isinstance(result.content, str):
+            return False
+        try:
+            payload = json.loads(result.content)
+        except json.JSONDecodeError:
+            return False
+        return isinstance(payload, dict) and payload.get("prepared") is True
+
     def wrap_tool_call(self, request: ToolCallRequest, handler: Any) -> ToolMessage | Command[Any]:
         """Check a tool call before delegating to the actual tool."""
         tool_call = request.tool_call
@@ -154,6 +189,27 @@ class PolicyMiddleware(AgentMiddleware):
         self.call_count += 1
         if tool_name not in self.allowed_tools:
             return self._deny(request, f"tool {tool_name!r} is not allowlisted", call_index)
+        if (
+            tool_name in PREPARATION_TOOLS
+            and self.stop_on_environment_failure
+            and not self.environment_failure_detected
+        ):
+            return self._deny(
+                request,
+                "dependency preparation requires a baseline environment failure",
+                call_index,
+            )
+        if (
+            self.stop_on_environment_failure
+            and self.environment_failure_detected
+            and tool_name in MUTATING_TOOLS
+            and not self.environment_preparation_completed
+        ):
+            return self._deny(
+                request,
+                "environment failure requires environment preparation before file mutations",
+                call_index,
+            )
         if (
             self.require_baseline_test
             and tool_name in MUTATING_TOOLS
@@ -184,7 +240,28 @@ class PolicyMiddleware(AgentMiddleware):
         if tool_name == "run_tests" and self.require_baseline_test:
             result = handler(request)
             self.baseline_test_completed = True
+            failure_class = self._environment_failure_class(result)
+            if self.stop_on_environment_failure and failure_class is not None:
+                self.environment_failure_detected = True
+                self.dependency_conflict_detected = failure_class == "dependency_conflict"
+                self._emit(
+                    "block_environment_recovery",
+                    tool_name,
+                    f"external dependency failure: {failure_class}",
+                    call_index,
+                )
             self._emit("allow", tool_name, "baseline test completed", call_index)
+            return result
+        if tool_name in PREPARATION_TOOLS:
+            result = handler(request)
+            if self._is_environment_prepared(result):
+                self.environment_preparation_completed = True
+                self._emit(
+                    "environment_prepared",
+                    tool_name,
+                    "approved dependency prepared",
+                    call_index,
+                )
             return result
         self._emit("allow", tool_name, "policy checks passed", call_index)
         return handler(request)

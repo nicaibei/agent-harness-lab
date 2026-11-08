@@ -1,0 +1,52 @@
+{
+  "generated_at": "2026-11-07T10:37:37.857081+00:00",
+  "task_id": "real-recovery-startup-import",
+  "run_count": 3,
+  "final_successes": 3,
+  "first_test_failures": 3,
+  "recovered_after_failure": 3,
+  "diff_chars": {
+    "min": 304,
+    "max": 304,
+    "mean": 304
+  },
+  "exploration_errors": 2,
+  "runs": [
+    {
+      "run_id": "20261107T102823Z-e6225779",
+      "first_test_passed": false,
+      "last_test_passed": true,
+      "recovered_after_failure": true,
+      "completed": true,
+      "tests_passed": true,
+      "diff_chars": 304,
+      "changed_files": [],
+      "policy_denials": 1,
+      "exploration_errors": 0
+    },
+    {
+      "run_id": "20261107T103524Z-1109cb1b",
+      "first_test_passed": false,
+      "last_test_passed": true,
+      "recovered_after_failure": true,
+      "completed": true,
+      "tests_passed": true,
+      "diff_chars": 304,
+      "changed_files": [],
+      "policy_denials": 1,
+      "exploration_errors": 1
+    },
+    {
+      "run_id": "20261107T103640Z-ee3b3b33",
+      "first_test_passed": false,
+      "last_test_passed": true,
+      "recovered_after_failure": true,
+      "completed": true,
+      "tests_passed": true,
+      "diff_chars": 304,
+      "changed_files": [],
+      "policy_denials": 1,
+      "exploration_errors": 1
+    }
+  ]
+}
