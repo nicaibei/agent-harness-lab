@@ -5,9 +5,11 @@ from __future__ import annotations
 import argparse
 import json
 from collections import Counter
+from datetime import UTC, datetime
 from pathlib import Path
 import subprocess
 import sys
+from time import perf_counter
 from typing import Literal
 
 from evals.formal_task_manifest import FormalTaskSpec, load_manifest
@@ -15,6 +17,7 @@ from evals.formal_task_manifest import FormalTaskSpec, load_manifest
 
 PLAN_SCHEMA_VERSION = "formal-plan.v1"
 OFFLINE_RESULT_SCHEMA_VERSION = "formal-offline.v1"
+MODEL_RESULT_SCHEMA_VERSION = "formal-model-result.v1"
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 ExecutionMode = Literal["agent_model", "harness_offline"]
 
@@ -105,6 +108,54 @@ def run_offline_tasks(*, split: str | None = None) -> dict[str, object]:
     }
 
 
+def run_model_task(task_id: str) -> dict[str, object]:
+    """Run exactly one explicitly selected train task through its existing runner."""
+    task = next((item for item in load_manifest() if item.task_id == task_id), None)
+    if task is None:
+        raise ValueError(f"Unknown formal evaluation task: {task_id}")
+    if task.split != "train":
+        raise ValueError("Real model runs are limited to train tasks until holdout is authorized")
+    if _execution_mode(task) != "agent_model":
+        raise ValueError(f"Task is not a model task: {task_id}")
+
+    started_at = datetime.now(UTC)
+    started = perf_counter()
+    if task.strata == "baseline":
+        from agent_app.baseline import run_task
+
+        run_dir = run_task(task.issue, Path(task.project), task_id=task.task_id)
+    else:
+        from evals.real_recovery import run_recovery_task
+
+        case_name = task.task_id.removeprefix("real-recovery-")
+        run_dir = run_recovery_task(case_name)
+    elapsed_seconds = perf_counter() - started
+    finished_at = datetime.now(UTC)
+    report_path = run_dir / "run.json"
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    return {
+        "schema_version": MODEL_RESULT_SCHEMA_VERSION,
+        "task_id": task.task_id,
+        "split": task.split,
+        "run_dir": str(run_dir),
+        "run_artifact": str(report_path),
+        "scenario": report.get("scenario"),
+        "started_at": started_at.isoformat(),
+        "finished_at": finished_at.isoformat(),
+        "latency_seconds": round(elapsed_seconds, 3),
+        "model_calls_requested": 1,
+        "completed": report.get("completed"),
+        "tests_passed": report.get("tests_passed"),
+        "execution_error": report.get("execution_error"),
+        "model": report.get("model"),
+        "diff_chars": len(report.get("diff", "")) if isinstance(report.get("diff"), str) else 0,
+        "test_run_count": len(report.get("test_runs", [])) if isinstance(report.get("test_runs"), list) else 0,
+        "event_count": len(report.get("events", [])) if isinstance(report.get("events"), list) else 0,
+        "cost": None,
+        "cost_status": "provider_usage_not_recorded",
+    }
+
+
 def write_plan(plan: dict[str, object], output: Path) -> Path:
     """Write one deterministic execution plan as JSON."""
     output.parent.mkdir(parents=True, exist_ok=True)
@@ -121,10 +172,16 @@ def main() -> None:
         type=Path,
         default=Path("evals/reports/formal-run-plan-v1.json"),
     )
-    parser.add_argument(
+    actions = parser.add_mutually_exclusive_group()
+    actions.add_argument(
         "--run-offline",
         action="store_true",
         help="Run only the explicitly assigned harness_offline pytest nodes.",
+    )
+    actions.add_argument(
+        "--run-model",
+        metavar="TASK_ID",
+        help="Run exactly one authorized train agent_model task; no automatic retry.",
     )
     args = parser.parse_args()
     if args.run_offline:
@@ -132,6 +189,12 @@ def main() -> None:
         output = write_plan(result, args.output)
         print(f"Offline tasks: {output}")
         print(f"Passed: {result['passed']}/{result['task_count']}; model calls: 0")
+        return
+    if args.run_model is not None:
+        result = run_model_task(args.run_model)
+        output = write_plan(result, args.output)
+        print(f"Model result: {output}")
+        print(f"Task: {result['task_id']}; tests_passed: {result['tests_passed']}")
         return
     plan = build_plan(split=args.split)
     output = write_plan(plan, args.output)

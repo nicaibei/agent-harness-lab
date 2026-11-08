@@ -6,7 +6,7 @@
 
 任务清单位于 [formal_tasks.json](../evals/formal_tasks.json)，由 [formal_task_manifest.py](../evals/formal_task_manifest.py) 校验。
 
-离线编排入口是 [formal_runner.py](../evals/formal_runner.py)。运行 `uv run python -m evals.formal_runner` 只生成执行计划，不调用模型；运行 `uv run python -m evals.formal_runner --run-offline` 只执行 manifest 明确绑定的 8 个本地 pytest node，模型调用数固定为 0。计划中的 `agent_model` 任务需要单独授权后才能执行。
+离线编排入口是 [formal_runner.py](../evals/formal_runner.py)。运行 `uv run python -m evals.formal_runner` 只生成执行计划，不调用模型；运行 `uv run python -m evals.formal_runner --run-offline` 只执行 manifest 明确绑定的 8 个本地 pytest node，模型调用数固定为 0。运行 `uv run python -m evals.formal_runner --run-model <train-task-id>` 才会执行一个明确授权的 train 模型任务，且不会自动重试。
 
 ## 任务组成
 
@@ -40,3 +40,9 @@
 ## Harness 离线基线
 
 已使用 `--run-offline` 执行 manifest 明确绑定的 8 个本地任务：2 个 Checkpoint 任务和 6 个 Policy 安全任务。结果为 `8/8` 通过，`model_calls=0`；每个任务保留独立 pytest node、退出码和输出摘要。该结果只证明 Harness 离线回归通过，不计入 Baseline 或真实 Recovery 成功率。
+
+## 首次真实模型冒烟运行
+
+在单独授权后，仅运行了 train 任务 `calculator-add-floats` 一次。运行 ID 为 `20261108T073634Z-282eb3b6`，`completed=true`、`tests_passed=true`，耗时约 `10.817s`，最终测试为 `5 passed`，生产 diff 只有预期的 `test_calculator.py` 测试增加，事件数为 20，Policy 拒绝数为 0。
+
+独立摘要见 [formal-model-calculator-add-floats-v1.json](../evals/reports/formal-model-calculator-add-floats-v1.json)。Provider usage 没有返回可记录的 token/cost，因此 `cost=null`，不能据此计算成本。该结果只是 runner 的 train 冒烟证据，不代表 Baseline 成功率，也不允许外推到 holdout。

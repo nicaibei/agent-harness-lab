@@ -1,0 +1,21 @@
+{
+  "schema_version": "formal-model-result.v1",
+  "task_id": "calculator-add-floats",
+  "split": "train",
+  "run_dir": "D:\\langgraph_learning\\agent-harness-lab\\runs\\20261108T073634Z-282eb3b6",
+  "run_artifact": "D:\\langgraph_learning\\agent-harness-lab\\runs\\20261108T073634Z-282eb3b6\\run.json",
+  "started_at": "2026-11-08T15:36:32.202814+08:00",
+  "finished_at": "2026-11-08T15:36:43.021488+08:00",
+  "latency_seconds": 10.817,
+  "model_calls_requested": 1,
+  "completed": true,
+  "tests_passed": true,
+  "execution_error": null,
+  "model": "deepseek-flash",
+  "cost": null,
+  "cost_status": "provider_usage_not_recorded",
+  "scenario": "baseline",
+  "diff_chars": 287,
+  "test_run_count": 1,
+  "event_count": 20
+}

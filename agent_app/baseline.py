@@ -305,6 +305,7 @@ def run_task(issue: str, project: Path, *, task_id: str | None = None) -> Path:
     report = {
         "run_id": run_id,
         "task_id": task_id,
+        "scenario": "baseline",
         "started_at": issue_time,
         "finished_at": datetime.now(UTC).isoformat(),
         "model": model_name,
