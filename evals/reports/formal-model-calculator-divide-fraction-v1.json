@@ -1,0 +1,21 @@
+{
+  "schema_version": "formal-model-result.v1",
+  "task_id": "calculator-divide-fraction",
+  "split": "train",
+  "run_dir": "D:\\langgraph_learning\\agent-harness-lab\\runs\\20261108T081509Z-d73a68d7",
+  "run_artifact": "D:\\langgraph_learning\\agent-harness-lab\\runs\\20261108T081509Z-d73a68d7\\run.json",
+  "scenario": "baseline",
+  "started_at": "2026-11-08T08:15:07.562697+00:00",
+  "finished_at": "2026-11-08T08:15:18.120981+00:00",
+  "latency_seconds": 10.558,
+  "model_calls_requested": 1,
+  "completed": true,
+  "tests_passed": true,
+  "execution_error": null,
+  "model": "deepseek-flash",
+  "diff_chars": 322,
+  "test_run_count": 1,
+  "event_count": 18,
+  "cost": null,
+  "cost_status": "provider_usage_not_recorded"
+}

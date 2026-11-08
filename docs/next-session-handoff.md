@@ -260,11 +260,11 @@ Python 模块已经正确，唯一故意错误是：
 
 已建立 `evals/formal_tasks.json` 和 `evals/formal_task_manifest.py`。当前有 30 个唯一任务：train 16 个，holdout 14 个；覆盖 Baseline、Recovery、跨文件、仓库集成、环境、Runtime 和 Policy 安全 strata。校验器要求 fixture 不跨 train/holdout，所有 evaluator 和预期文件路径存在。说明见 `docs/formal-evaluation-set-v1.md`。
 
-这只是任务清单和 split 冻结，不代表 30 个任务已经用统一 runner 完成真实模型评测。已增加 `evals/formal_runner.py`，当前只生成不调用模型的执行计划，并保持 `run.v1` 产物和独立实验分母。
+这只是任务清单和 split 冻结，不代表 30 个任务已经用统一 runner 完成真实模型评测。已增加 `evals/formal_runner.py`，它可以生成不调用模型的执行计划、运行离线 Harness node，或在明确授权后执行一个 train 模型任务，并保持 `run.v1` 产物和独立实验分母。
 
 离线执行入口已经验证：Checkpoint v1/v2 和 6 个 Policy 安全 node 共 8 个任务，`8/8` 通过，`model_calls=0`。这只是 Harness 回归证据，不计入模型成功率。
 
-真实模型冒烟运行已完成两个 train 任务：`calculator-add-floats`（`20261108T073634Z-282eb3b6`，5 passed，10.817s）和 `calculator-subtract-negative`（`20261108T074306Z-583d14dc`，5 passed，10.030s）。两个 diff 都只改预期测试文件；摘要分别为 `evals/reports/formal-model-calculator-add-floats-v1.json` 和 `evals/reports/formal-model-calculator-subtract-negative-v1.json`。没有记录 token/cost，因此不能计算成本。
+真实模型冒烟运行已完成三个 train 任务：`calculator-add-floats`（`20261108T073634Z-282eb3b6`，5 passed，10.817s）、`calculator-subtract-negative`（`20261108T074306Z-583d14dc`，5 passed，10.030s）和 `calculator-divide-fraction`（`20261108T081509Z-d73a68d7`，5 passed，10.558s）。三个 diff 都只改预期测试文件；第三个摘要为 `evals/reports/formal-model-calculator-divide-fraction-v1.json`。没有记录 token/cost，因此不能计算成本，也不能把这三次冒烟结果外推为完整 Baseline 成功率。
 
 ## 16. 下一个阶段建议
 

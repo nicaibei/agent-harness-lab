@@ -35,7 +35,7 @@
 - Checkpoint v1/v2 和 Policy 任务是离线验证；
 - 目前还没有用统一 runner 对 30 个任务跑出同一批次的可比模型指标。
 
-因此本文件完成的是“任务集和 split 冻结”，不是最终评测报告。下一步应实现统一 manifest runner，在不改变 split 的前提下分别运行 Baseline、Policy/Recovery 增强版本，并记录成本、延迟、工具调用次数和 `run.v1` 产物。
+因此本文件完成的是“任务集和 split 冻结”，不是最终评测报告。统一 manifest runner 已支持离线 Harness 任务和一次明确授权的 train 模型任务；仍需在不改变 split 的前提下分别运行 Baseline、Policy/Recovery 增强版本，并记录成本、延迟、工具调用次数和 `run.v1` 产物。
 
 ## Harness 离线基线
 
@@ -43,11 +43,12 @@
 
 ## 真实模型冒烟运行
 
-在分别授权后，已运行两个 train 任务，各运行一次：
+在分别授权后，已运行三个 train 任务，各运行一次：
 
 | 任务 | 运行 ID | 最终测试 | diff | 耗时 | 事件数 |
 | --- | --- | --- | ---: | ---: | ---: |
 | `calculator-add-floats` | `20261108T073634Z-282eb3b6` | 5 passed | 287 | 10.817s | 20 |
 | `calculator-subtract-negative` | `20261108T074306Z-583d14dc` | 5 passed | 277 | 10.030s | 18 |
+| `calculator-divide-fraction` | `20261108T081509Z-d73a68d7` | 5 passed | 322 | 10.558s | 18 |
 
-两个任务都只修改了预期的 `test_calculator.py`，没有 Policy 拒绝或执行错误。独立摘要见 [formal-model-calculator-add-floats-v1.json](../evals/reports/formal-model-calculator-add-floats-v1.json) 和 [formal-model-calculator-subtract-negative-v1.json](../evals/reports/formal-model-calculator-subtract-negative-v1.json)。Provider usage 没有返回可记录的 token/cost，因此 `cost=null`，不能据此计算成本或 Baseline 成功率，也不允许外推到 holdout。
+三个任务都只修改了预期的 `test_calculator.py`，没有 Policy 拒绝或执行错误。第三个任务的独立摘要见 [formal-model-calculator-divide-fraction-v1.json](../evals/reports/formal-model-calculator-divide-fraction-v1.json)；前两个摘要见 [formal-model-calculator-add-floats-v1.json](../evals/reports/formal-model-calculator-add-floats-v1.json) 和 [formal-model-calculator-subtract-negative-v1.json](../evals/reports/formal-model-calculator-subtract-negative-v1.json)。Provider usage 没有返回可记录的 token/cost，因此 `cost=null`，这三次 train 冒烟运行不能代表完整 Baseline 成功率，也不允许外推到 holdout。
