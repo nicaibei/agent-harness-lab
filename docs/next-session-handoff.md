@@ -252,23 +252,31 @@ Python 模块已经正确，唯一故意错误是：
 
 新的 `run.json` 使用 `schema_version=run.v1`，新的 replay 使用 `schema_version=replay.v1`。统一字段包括 `completed`、`tests_passed`、`execution_error`、`test_runs`、`diff`、`events` 和 `replay`。Checkpoint v1 使用 `in-memory`，Checkpoint v2 使用 `file-json`；旧产物没有 schema 版本，继续按 legacy 处理。说明见 docs/run-artifact-schema-v1.md。
 
-## 14. 下一个阶段建议
+## 14. 最近完成的架构和源码核对
 
-下一步独立实验建议做“允许离线安装依赖”或“版本冲突 Recovery v1”，不要把它和本次环境停止实验合并。应按以下顺序：
+已完成 `docs/architecture.md` 与 `docs/source-notes.md` 的源码证据补充：记录 `create_deep_agent()` 从 model/profile/backend 解析，到 Filesystem、SubAgent、Summarization、Skills、Memory、HumanInTheLoop 和自定义 middleware，再到 `create_agent(checkpointer=..., store=...)` 的组装链。源码依据是 `D:\langgraph_learning\deepagent` 当前 checkout，没有修改上游仓库。
 
-1. 先说明这个实验要区分业务逻辑错误、包启动错误和依赖/环境错误；
-2. 设计一个提供本地 wheel 或受控版本集合的离线 fixture；
-3. 明确依赖安装是否属于 Agent 能力，还是 Harness 的环境准备能力；
-4. 先验证离线安装、错误分类和安全边界；
-5. 解释离线结果后，再单独请求一次 DeepSeek 真实运行授权；
-6. 真实运行后读取 `run.json` 和 `diff.patch`，检查是否发生了正确的恢复；
-7. 必要时重复运行，最后更新矩阵和文档；
-8. 完成复盘后再提醒是否适合下一次 GitHub 提交。
+## 15. 正式评估集 v1
 
-当前不要把第三方依赖错误与配置错误或包导入错误混在同一个 fixture 中，否则无法判断模型修复了哪一类失败。
+已建立 `evals/formal_tasks.json` 和 `evals/formal_task_manifest.py`。当前有 30 个唯一任务：train 16 个，holdout 14 个；覆盖 Baseline、Recovery、跨文件、仓库集成、环境、Runtime 和 Policy 安全 strata。校验器要求 fixture 不跨 train/holdout，所有 evaluator 和预期文件路径存在。说明见 `docs/formal-evaluation-set-v1.md`。
 
-## 15. 下一个对话的开场提示
+这只是任务清单和 split 冻结，不代表 30 个任务已经用统一 runner 完成真实模型评测。下一步是实现统一 runner，并保持 `run.v1` 产物和独立实验分母。
+
+## 16. 下一个阶段建议
+
+按以下顺序进入正式评测：
+
+1. 为 formal manifest 实现统一离线 runner，先覆盖路径、任务状态和产物保存；
+2. 先跑本地 Harness 回归，确认 Baseline、Policy、Recovery、Checkpoint 的结果不会混组；
+3. 设计成本、延迟、工具调用次数和人工介入率字段；
+4. 只在需要真实模型指标时，单独请求一次 DeepSeek 运行授权；
+5. 分别生成 train 和 holdout 报告，不提前做 Harness 自动优化；
+6. 复盘失败样本后，再决定是否增加多包依赖或并发恢复实验。
+
+当前不要把 holdout 用于 Prompt 或 Policy 调参，也不要把离线 Harness 通过率写成真实模型成功率。
+
+## 17. 下一个对话的开场提示
 
 可以直接把下面这句话发给下一个对话：
 
-> 请先阅读 docs/next-session-handoff.md。我们在 D:/langgraph_learning/agent-harness-lab 上做 Agent Harness 学习实验。先检查本地提交和未提交的实验改动，复盘启动 Recovery 和第三方依赖环境停止实验，再解释下一步允许离线安装依赖或版本冲突 Recovery v1 的目的、失败模式、控制变量、成功标准和是否需要服务器；新的真实模型调用必须先请求单独授权。
+> 请先阅读 docs/next-session-handoff.md。我们在 D:/langgraph_learning/agent-harness-lab 上做 Agent Harness 学习实验。当前已推送 Checkpoint v1/v2、run.v1 产物 schema、架构源码笔记和 30 任务 train/holdout manifest。下一步实现统一离线评测 runner，先说明实验目的、失败模式、控制变量、成功标准和资源使用；新的真实模型调用必须先请求单独授权。
