@@ -35,6 +35,7 @@ def test_replay_summarizes_events_without_running_side_effects() -> None:
 
     report = replay_events(events)
 
+    assert report["schema_version"] == "replay.v1"
     assert report["mode"] == "events-only"
     assert report["event_count"] == 5
     assert report["policy_denials"] == 1
@@ -87,6 +88,7 @@ def test_agent_resumes_from_checkpoint_after_tool_interrupt() -> None:
     assert "__interrupt__" in paused
     assert calls_before_resume == []
     assert summary_before["checkpoint_count"] > 0
+    assert summary_before["persistence"] == "in-memory"
     assert calls == ["one"]
     assert resumed["messages"][-1].content == "finished"
     assert summary_after["checkpoint_count"] > summary_before["checkpoint_count"]

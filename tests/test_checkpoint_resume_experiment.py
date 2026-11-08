@@ -19,6 +19,9 @@ def test_checkpoint_resume_runner_records_waiting_and_resume(
 
     assert report["paused"] is True
     assert report["resumed"] is True
+    assert report["schema_version"] == "run.v1"
+    assert report["diff"]
+    assert report["events"][0]["schema_version"] == "event.v1"
     assert report["side_effects_before_resume"] is False
     assert report["tests_passed"] is True
     assert report["checkpoint_after_resume"]["checkpoint_count"] > report[
@@ -43,12 +46,16 @@ def test_checkpoint_resume_survives_a_process_restart(tmp_path: Path) -> None:
 
     assert report["paused"] is True
     assert report["resumed"] is True
+    assert report["schema_version"] == "run.v1"
+    assert report["diff"]
+    assert report["events"][0]["schema_version"] == "event.v1"
     assert report["side_effects_before_resume"] is False
     assert report["tests_passed"] is True
     assert report["checkpoint_after_resume"]["checkpoint_count"] > report[
         "checkpoint_before_resume"
     ]["checkpoint_count"]
     assert (run_dir / "checkpoint-store.json").is_file()
+    assert report["checkpoint_before_resume"]["persistence"] == "file-json"
     assert report["replay"]["event_names"] == [
         "run_started",
         "workspace_created",

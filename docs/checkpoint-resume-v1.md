@@ -37,6 +37,7 @@
 - resumed：true；
 - side_effects_before_resume：false；
 - checkpoint 数量：4 → 12；
+- checkpoint persistence：`in-memory`；
 - tests_passed：true；
 - production diff：505 字符，内容是预期的 calculator 文档变化；
 - replay test_runs：1；

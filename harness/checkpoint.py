@@ -11,9 +11,13 @@ from typing import Any
 from langgraph.checkpoint.base import BaseCheckpointSaver
 from langgraph.checkpoint.memory import InMemorySaver
 
+from harness.schema import REPLAY_SCHEMA_VERSION
+
 
 class FileCheckpointSaver(InMemorySaver):
     """Persist LangGraph checkpoints to a local JSON file for experiments."""
+
+    persistence = "file-json"
 
     def __init__(self, path: Path) -> None:
         super().__init__()
@@ -139,7 +143,7 @@ def summarize_checkpoints(
         "thread_id": config.get("configurable", {}).get("thread_id"),
         "checkpoint_count": len(checkpoints),
         "latest_checkpoint_id": configurable.get("checkpoint_id"),
-        "persistence": "in-memory",
+        "persistence": getattr(checkpointer, "persistence", "in-memory"),
     }
 
 
@@ -152,6 +156,7 @@ def replay_events(events: Iterable[Mapping[str, Any]]) -> dict[str, Any]:
         {},
     )
     return {
+        "schema_version": REPLAY_SCHEMA_VERSION,
         "mode": "events-only",
         "event_count": len(event_list),
         "event_names": names,

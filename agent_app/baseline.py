@@ -25,6 +25,7 @@ from langgraph.checkpoint.memory import InMemorySaver
 from harness.checkpoint import replay_events, summarize_checkpoints
 from harness.policy import PolicyMiddleware
 from harness.recovery import RecoveryMiddleware
+from harness.schema import EVENT_SCHEMA_VERSION, normalize_replay_report, normalize_run_report
 
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
@@ -95,9 +96,10 @@ def _save_run_artifacts(
 ) -> None:
     """Persist run artifacts even if the workspace removed its parent directory."""
     run_dir.mkdir(parents=True, exist_ok=True)
+    normalized_report = normalize_run_report(report, diff, replay)
     (run_dir / "diff.patch").write_text(diff, encoding="utf-8")
     (run_dir / "run.json").write_text(
-        json.dumps(report, ensure_ascii=False, indent=2),
+        json.dumps(normalized_report, ensure_ascii=False, indent=2),
         encoding="utf-8",
     )
     if checkpoint is not None:
@@ -107,7 +109,7 @@ def _save_run_artifacts(
         )
     if replay is not None:
         (run_dir / "replay.json").write_text(
-            json.dumps(replay, ensure_ascii=False, indent=2),
+            json.dumps(normalize_replay_report(replay), ensure_ascii=False, indent=2),
             encoding="utf-8",
         )
 
@@ -116,6 +118,7 @@ def _record_event(events: list[dict[str, Any]], event: str, **details: Any) -> N
     """Append a timestamped, JSON-serializable run event."""
     events.append(
         {
+            "schema_version": EVENT_SCHEMA_VERSION,
             "event": event,
             "timestamp": datetime.now(UTC).isoformat(),
             **details,

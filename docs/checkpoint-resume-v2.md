@@ -47,6 +47,7 @@ v1 只验证了同一进程里的 InMemorySaver。v2 增加进程重启变量，
 - replay test_runs：1；
 - replay 状态顺序：run_started → workspace_created → run_waiting → process_restarted → run_resumed → test_run → run_finished；
 - checkpoint-store.json：约 43 KB。
+- checkpoint persistence：`file-json`；
 
 跨进程回归测试和 v1 测试共 4 passed。全量测试结果为 71 passed，只有 Windows .pytest_cache 写入警告。
 

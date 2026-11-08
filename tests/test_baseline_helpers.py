@@ -1,5 +1,6 @@
 """Tests for deterministic baseline behavior that does not require an API key."""
 
+import json
 from pathlib import Path
 
 import pytest
@@ -107,3 +108,9 @@ def test_save_run_artifacts_writes_checkpoint_and_replay_reports(tmp_path: Path)
 
     assert '"checkpoint_count": 3' in (run_dir / "checkpoint.json").read_text(encoding="utf-8")
     assert '"mode": "events-only"' in (run_dir / "replay.json").read_text(encoding="utf-8")
+
+    saved_report = json.loads((run_dir / "run.json").read_text(encoding="utf-8"))
+    assert saved_report["schema_version"] == "run.v1"
+    assert saved_report["diff"] == "diff"
+    assert saved_report["replay"]["schema_version"] == "replay.v1"
+    assert '"schema_version": "replay.v1"' in (run_dir / "replay.json").read_text(encoding="utf-8")

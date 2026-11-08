@@ -248,7 +248,11 @@ Python 模块已经正确，唯一故意错误是：
 
 实验说明：docs/checkpoint-resume-v2.md。跨进程回归测试已经加入。
 
-## 13. 下一个阶段建议
+## 13. 已冻结运行产物 schema v1
+
+新的 `run.json` 使用 `schema_version=run.v1`，新的 replay 使用 `schema_version=replay.v1`。统一字段包括 `completed`、`tests_passed`、`execution_error`、`test_runs`、`diff`、`events` 和 `replay`。Checkpoint v1 使用 `in-memory`，Checkpoint v2 使用 `file-json`；旧产物没有 schema 版本，继续按 legacy 处理。说明见 docs/run-artifact-schema-v1.md。
+
+## 14. 下一个阶段建议
 
 下一步独立实验建议做“允许离线安装依赖”或“版本冲突 Recovery v1”，不要把它和本次环境停止实验合并。应按以下顺序：
 
@@ -263,7 +267,7 @@ Python 模块已经正确，唯一故意错误是：
 
 当前不要把第三方依赖错误与配置错误或包导入错误混在同一个 fixture 中，否则无法判断模型修复了哪一类失败。
 
-## 14. 下一个对话的开场提示
+## 15. 下一个对话的开场提示
 
 可以直接把下面这句话发给下一个对话：
 
