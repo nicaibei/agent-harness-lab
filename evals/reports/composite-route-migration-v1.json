@@ -1,0 +1,191 @@
+{
+  "run_id": "20261108T090355Z-8c7c6762",
+  "task_id": "composite-route-migration-v1",
+  "scenario": "offline-real-module-migration",
+  "run_dir": "D:\\langgraph_learning\\agent-harness-lab\\runs\\migration\\20261108T090355Z-8c7c6762",
+  "source_module": "D:\\langgraph_learning\\deepagent\\libs\\deepagents\\deepagents\\backends\\composite.py",
+  "hidden_evaluator": "D:\\langgraph_learning\\agent-harness-lab\\evals\\hidden_tests\\test_composite_route_migration.py",
+  "model": "fake-offline",
+  "model_calls": 4,
+  "cost": null,
+  "cost_status": "not_applicable",
+  "execution_error": null,
+  "completed": true,
+  "tests_passed": true,
+  "first_test_failed": true,
+  "changed_files": [
+    "composite.py"
+  ],
+  "expected_files": [
+    "composite.py"
+  ],
+  "unexpected_files": [],
+  "diff_scope_valid": true,
+  "task_success": true,
+  "test_runs": [
+    {
+      "success": false,
+      "exit_code": 1,
+      "output": "FF                                                                       [100%]\n================================== FAILURES ===================================\n___________________ test_memories_path_uses_routed_backend ____________________\n\n    def test_memories_path_uses_routed_backend() -> None:\n        \"\"\"A path inside /memories/ is stored by the routed backend.\"\"\"\n        route_app.reset_backends()\n    \n        result = route_app.write_and_read(\"/memories/note.txt\", \"persistent\")\n    \n        assert result[\"write_error\"] is None\n        assert result[\"read_content\"] == \"persistent\"\n        assert result[\"default_writes\"] == []\n>       assert result[\"routed_writes\"] == [\"/note.txt\"]\nE       AssertionError: assert ['//note.txt'] == ['/note.txt']\nE         \nE         At index 0 diff: '//note.txt' != '/note.txt'\nE         Use -v to get more diff\n\n..\\..\\..\\..\\evals\\hidden_tests\\test_composite_route_migration.py:15: AssertionError\n______________ test_memories_old_prefix_stays_on_default_backend ______________\n\n    def test_memories_old_prefix_stays_on_default_backend() -> None:\n        \"\"\"A near-prefix must not be treated as the /memories/ route.\"\"\"\n        route_app.reset_backends()\n    \n        result = route_app.write_and_read(\"/memories-old/note.txt\", \"temporary\")\n    \n        assert result[\"write_error\"] is None\n        assert result[\"read_content\"] == \"temporary\"\n>       assert result[\"default_writes\"] == [\"/memories-old/note.txt\"]\nE       AssertionError: assert [] == ['/memories-old/note.txt']\nE         \nE         Right contains one more item: '/memories-old/note.txt'\nE         Use -v to get more diff\n\n..\\..\\..\\..\\evals\\hidden_tests\\test_composite_route_migration.py:26: AssertionError\n=========================== short test summary info ===========================\nFAILED ..\\..\\..\\..\\evals\\hidden_tests\\test_composite_route_migration.py::test_memories_path_uses_routed_backend\nFAILED ..\\..\\..\\..\\evals\\hidden_tests\\test_composite_route_migration.py::test_memories_old_prefix_stays_on_default_backend\n2 failed in 1.16s"
+    },
+    {
+      "success": true,
+      "exit_code": 0,
+      "output": "..                                                                       [100%]\n2 passed in 0.69s"
+    }
+  ],
+  "events": [
+    {
+      "schema_version": "event.v1",
+      "event": "run_started",
+      "timestamp": "2026-11-08T09:03:55.696804+00:00",
+      "run_id": "20261108T090355Z-8c7c6762",
+      "task_id": "composite-route-migration-v1",
+      "model_mode": "offline"
+    },
+    {
+      "schema_version": "event.v1",
+      "event": "workspace_created",
+      "timestamp": "2026-11-08T09:03:55.696804+00:00",
+      "workspace": "D:\\langgraph_learning\\agent-harness-lab\\runs\\migration\\20261108T090355Z-8c7c6762\\workspace",
+      "file_count": 2
+    },
+    {
+      "schema_version": "event.v1",
+      "event": "agent_started",
+      "timestamp": "2026-11-08T09:03:55.776136+00:00",
+      "model": "fake-offline",
+      "source_module": "libs\\deepagents\\deepagents\\backends\\composite.py"
+    },
+    {
+      "schema_version": "event.v1",
+      "event": "test_run",
+      "timestamp": "2026-11-08T09:03:58.409450+00:00",
+      "attempt": 1,
+      "success": false,
+      "exit_code": 1,
+      "output": "FF                                                                       [100%]\n================================== FAILURES ===================================\n___________________ test_memories_path_uses_routed_backend ____________________\n\n    def test_memories_path_uses_routed_backend() -> None:\n        \"\"\"A path inside /memories/ is stored by the routed backend.\"\"\"\n        route_app.reset_backends()\n    \n        result = route_app.write_and_read(\"/memories/note.txt\", \"persistent\")\n    \n        assert result[\"write_error\"] is None\n        assert result[\"read_content\"] == \"persistent\"\n        assert result[\"default_writes\"] == []\n>       assert result[\"routed_writes\"] == [\"/note.txt\"]\nE       AssertionError: assert ['//note.txt'] == ['/note.txt']\nE         \nE         At index 0 diff: '//note.txt' != '/note.txt'\nE         Use -v to get more diff\n\n..\\..\\..\\..\\evals\\hidden_tests\\test_composite_route_migration.py:15: AssertionError\n______________ test_memories_old_prefix_stays_on_default_backend ______________\n\n    def test_memories_old_prefix_stays_on_default_backend() -> None:\n        \"\"\"A near-prefix must not be treated as the /memories/ route.\"\"\"\n        route_app.reset_backends()\n    \n        result = route_app.write_and_read(\"/memories-old/note.txt\", \"temporary\")\n    \n        assert result[\"write_error\"] is None\n        assert result[\"read_content\"] == \"temporary\"\n>       assert result[\"default_writes\"] == [\"/memories-old/note.txt\"]\nE       AssertionError: assert [] == ['/memories-old/note.txt']\nE         \nE         Right contains one more item: '/memories-old/note.txt'\nE         Use -v to get more diff\n\n..\\..\\..\\..\\evals\\hidden_tests\\test_composite_route_migration.py:26: AssertionError\n=========================== short test summary info ===========================\nFAILED ..\\..\\..\\..\\evals\\hidden_tests\\test_composite_route_migration.py::test_memories_path_uses_routed_backend\nFAILED ..\\..\\..\\..\\evals\\hidden_tests\\test_composite_route_migration.py::test_memories_old_prefix_stays_on_default_backend\n2 failed in 1.16s"
+    },
+    {
+      "schema_version": "event.v1",
+      "event": "policy_decision",
+      "timestamp": "2026-11-08T09:03:58.410982+00:00",
+      "decision": "allow",
+      "tool": "run_tests",
+      "reason": "baseline test completed",
+      "call_index": 1
+    },
+    {
+      "schema_version": "event.v1",
+      "event": "recovery_failure",
+      "timestamp": "2026-11-08T09:03:58.410982+00:00",
+      "tool": "run_tests",
+      "category": "tool_error",
+      "attempt": 1,
+      "error": "{\"success\": false, \"exit_code\": 1, \"output\": \"FF                                                                       [100%]\\n================================== FAILURES ===================================\\n___________________ test_memories_path_uses_routed_backend ____________________\\n\\n    def test_memories_path_uses_routed_backend() -> None:\\n        \\\"\\\"\\\"A path inside /memories/ is stored by the routed backend.\\\"\\\"\\\"\\n        route_app.reset_backends()\\n    \\n        result = route_app.wr"
+    },
+    {
+      "schema_version": "event.v1",
+      "event": "recovery_terminal",
+      "timestamp": "2026-11-08T09:03:58.410982+00:00",
+      "tool": "run_tests",
+      "category": "tool_error"
+    },
+    {
+      "schema_version": "event.v1",
+      "event": "policy_decision",
+      "timestamp": "2026-11-08T09:03:58.416235+00:00",
+      "decision": "allow",
+      "tool": "edit_file",
+      "reason": "policy checks passed",
+      "call_index": 2
+    },
+    {
+      "schema_version": "event.v1",
+      "event": "recovery_success",
+      "timestamp": "2026-11-08T09:03:58.416235+00:00",
+      "tool": "edit_file",
+      "attempt": 1
+    },
+    {
+      "schema_version": "event.v1",
+      "event": "test_run",
+      "timestamp": "2026-11-08T09:04:00.584999+00:00",
+      "attempt": 2,
+      "success": true,
+      "exit_code": 0,
+      "output": "..                                                                       [100%]\n2 passed in 0.69s"
+    },
+    {
+      "schema_version": "event.v1",
+      "event": "policy_decision",
+      "timestamp": "2026-11-08T09:04:00.584999+00:00",
+      "decision": "allow",
+      "tool": "run_tests",
+      "reason": "baseline test completed",
+      "call_index": 3
+    },
+    {
+      "schema_version": "event.v1",
+      "event": "recovery_success",
+      "timestamp": "2026-11-08T09:04:00.584999+00:00",
+      "tool": "run_tests",
+      "attempt": 1
+    },
+    {
+      "schema_version": "event.v1",
+      "event": "agent_finished",
+      "timestamp": "2026-11-08T09:04:00.592244+00:00",
+      "message_count": 8
+    },
+    {
+      "schema_version": "event.v1",
+      "event": "diff_scope_checked",
+      "timestamp": "2026-11-08T09:04:00.595520+00:00",
+      "changed_files": [
+        "composite.py"
+      ],
+      "expected_files": [
+        "composite.py"
+      ],
+      "unexpected_files": [],
+      "diff_scope_valid": true
+    },
+    {
+      "schema_version": "event.v1",
+      "event": "run_finished",
+      "timestamp": "2026-11-08T09:04:00.595520+00:00",
+      "completed": true,
+      "tests_passed": true,
+      "task_success": true,
+      "diff_scope_valid": true
+    }
+  ],
+  "schema_version": "run.v1",
+  "diff": "--- a/composite.py\n+++ b/composite.py\n@@ -217,7 +217,7 @@\n             return backend, \"/\", route_prefix\n \n         # Ensure route_prefix ends with / for startswith check to enforce boundary\n-        normalized_prefix = route_prefix.rstrip(\"/\")\n+        normalized_prefix = route_prefix if route_prefix.endswith(\"/\") else f\"{route_prefix}/\"\n         if path.startswith(normalized_prefix):\n             suffix = path[len(normalized_prefix) :]\n             backend_path = f\"/{suffix}\" if suffix else \"/\"\n",
+  "replay": {
+    "schema_version": "replay.v1",
+    "mode": "events-only",
+    "event_count": 15,
+    "event_names": [
+      "run_started",
+      "workspace_created",
+      "agent_started",
+      "test_run",
+      "policy_decision",
+      "recovery_failure",
+      "recovery_terminal",
+      "policy_decision",
+      "recovery_success",
+      "test_run",
+      "policy_decision",
+      "recovery_success",
+      "agent_finished",
+      "diff_scope_checked",
+      "run_finished"
+    ],
+    "test_runs": 2,
+    "completed": true,
+    "tests_passed": true
+  }
+}

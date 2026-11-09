@@ -38,7 +38,7 @@ git -c safe.directory=D:/langgraph_learning/agent-harness-lab push origin main
 1. 实验开始前说明目的、要研究的失败模式、故意设置的错误、Agent 应如何处理、控制变量、成功标准、是否调用 DeepSeek、是否消耗额度、是否需要租服务器。
 2. 代码实施前让用户先表达设计理解；用户的回答无论正确、部分正确还是错误，都要给出完整标准答案和修正点。
 3. 实验完成后解释实际发生了什么、修改了什么、首次和最终测试、Policy/Recovery 做了什么、能证明什么、不能证明什么，以及用户学到了什么。
-4. 每次新的真实 DeepSeek 调用都要先明确用途并请求用户授权；已有一次授权不自动覆盖后续新的调用。
+4. 真实调用按当前授权规则执行：单个实验批次预计少于 10 次调用时默认授权；预计 10 次及以上时先询问用户。仍需在实验开始前说明用途、调用上限和资源消耗。
 5. GitHub 提交前必须完成复盘。到达适合提交的里程碑时主动提醒用户；不要把本地 commit 误说成已经推送到 GitHub。
 6. 不要埋头连续做很多实验。完成一个阶段后先解释结果，再继续下一阶段。
 7. 当前所有实验都在 `agent-harness-lab`，不要切换到 `D:\langgraph_learning\deepagent` 做项目实验。
@@ -266,14 +266,18 @@ Python 模块已经正确，唯一故意错误是：
 
 真实模型冒烟运行已完成三个 train 任务：`calculator-add-floats`（`20261108T073634Z-282eb3b6`，5 passed，10.817s）、`calculator-subtract-negative`（`20261108T074306Z-583d14dc`，5 passed，10.030s）和 `calculator-divide-fraction`（`20261108T081509Z-d73a68d7`，5 passed，10.558s）。三个 diff 都只改预期测试文件；第三个摘要为 `evals/reports/formal-model-calculator-divide-fraction-v1.json`。没有记录 token/cost，因此不能计算成本，也不能把这三次冒烟结果外推为完整 Baseline 成功率。
 
-## 16. 下一个阶段建议
+## 17. 真实 SDK 模块迁移验证 v1
+
+已完成真实模块迁移验证：从 `D:\langgraph_learning\deepagent` 复制 `deepagents/backends/composite.py` 到隔离 workspace，注入一个 `/memories/` 路由边界缺陷。离线 Fake Model 运行验证了 Harness 判定链路；随后在单独授权后完成一次真实 DeepSeek 运行，运行 ID 为 `20261108T090526Z-99d9d7f9`，首次测试 `2 failed`，DeepSeek 通过 `grep/read_file` 定位后修改 `composite.py`，第二次测试 `2 passed`，只修改预期文件，`diff_scope_valid=true`，观察到 9 个模型响应，成本未记录。workspace 外隐藏测试验证 `/memories/` 进入 routed Backend、`/memories-old/` 留在 default Backend。完整说明见 `docs/composite-route-migration-v1.md`，离线摘要见 `evals/reports/composite-route-migration-v1.json`，真实摘要见 `evals/reports/composite-route-migration-real-v1.json`。
+
+## 18. 下一个阶段建议
 
 按以下顺序进入正式评测：
 
 1. 为 formal manifest 实现统一离线 runner，先覆盖路径、任务状态和产物保存；
 2. 先跑本地 Harness 回归，确认 Baseline、Policy、Recovery、Checkpoint 的结果不会混组；
 3. 设计成本、延迟、工具调用次数和人工介入率字段；
-4. 只在需要真实模型指标时，单独请求一次 DeepSeek 运行授权；
+4. 只在需要真实模型指标时运行 DeepSeek；少于 10 次调用的批次按当前授权规则直接执行，10 次及以上先询问；
 5. 分别生成 train 和 holdout 报告，不提前做 Harness 自动优化；
 6. 复盘失败样本后，再决定是否增加多包依赖或并发恢复实验。
 
@@ -283,4 +287,4 @@ Python 模块已经正确，唯一故意错误是：
 
 可以直接把下面这句话发给下一个对话：
 
-> 请先阅读 docs/next-session-handoff.md。我们在 D:/langgraph_learning/agent-harness-lab 上做 Agent Harness 学习实验。当前已推送 Checkpoint v1/v2、run.v1 产物 schema、架构源码笔记和 30 任务 train/holdout manifest。下一步实现统一离线评测 runner，先说明实验目的、失败模式、控制变量、成功标准和资源使用；新的真实模型调用必须先请求单独授权。
+> 请先阅读 docs/next-session-handoff.md。我们在 D:/langgraph_learning/agent-harness-lab 上做 Agent Harness 学习实验。当前已推送 Checkpoint v1/v2、run.v1 产物 schema、架构源码笔记和 30 任务 train/holdout manifest。下一步先说明实验目的、失败模式、控制变量、成功标准和资源使用；少于 10 次真实模型调用按当前授权规则执行，10 次及以上先询问。
