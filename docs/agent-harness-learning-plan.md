@@ -175,6 +175,8 @@
 - [x] 完成 3 个 train 任务的真实模型 runner 冒烟运行；
 - [x] 完成一次真实 SDK 模块迁移验证（CompositeBackend 路由边界）；
 - [x] 完成一次真实 DeepSeek SDK 模块迁移运行并保留独立证据；
+- [x] 完成 FilesystemMiddleware 权限边界迁移的离线真实模块实验；
+- [ ] 完成一次 FilesystemMiddleware 权限迁移真实模型运行（等待该新源码 payload 的具体外发授权）；
 - [ ] 复盘环境停止与环境准备两个实验的边界；
 - [ ] 评估是否需要多包传递依赖实验；
 

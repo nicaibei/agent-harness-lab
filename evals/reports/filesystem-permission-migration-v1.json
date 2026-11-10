@@ -1,0 +1,191 @@
+{
+  "run_id": "20261110T061159Z-2a38231f",
+  "task_id": "filesystem-permission-migration-v1",
+  "scenario": "offline-real-module-migration",
+  "run_dir": "D:\\langgraph_learning\\agent-harness-lab\\runs\\migration-permissions\\20261110T061159Z-2a38231f",
+  "source_module": "D:\\langgraph_learning\\deepagent\\libs\\deepagents\\deepagents\\middleware\\filesystem.py",
+  "hidden_evaluator": "D:\\langgraph_learning\\agent-harness-lab\\evals\\hidden_tests\\test_filesystem_permission_migration.py",
+  "model": "fake-offline",
+  "model_calls": 4,
+  "cost": null,
+  "cost_status": "not_applicable",
+  "execution_error": null,
+  "completed": true,
+  "tests_passed": true,
+  "first_test_failed": true,
+  "changed_files": [
+    "filesystem.py"
+  ],
+  "expected_files": [
+    "filesystem.py"
+  ],
+  "unexpected_files": [],
+  "diff_scope_valid": true,
+  "task_success": true,
+  "test_runs": [
+    {
+      "success": false,
+      "exit_code": 1,
+      "output": "FF.                                                                      [100%]\n================================== FAILURES ===================================\n_________________________ test_secret_read_is_denied __________________________\n\n    def test_secret_read_is_denied() -> None:\n        result = permission_app.check_read(\"/secrets/key.txt\")\n    \n>       assert result[\"status\"] == \"error\"\nE       AssertionError: assert 'success' == 'error'\nE         \nE         - error\nE         + success\n\n..\\..\\..\\..\\evals\\hidden_tests\\test_filesystem_permission_migration.py:9: AssertionError\n_________________________ test_secret_write_is_denied _________________________\n\n    def test_secret_write_is_denied() -> None:\n        result = permission_app.check_write(\"/secrets/key.txt\")\n    \n>       assert result[\"status\"] == \"error\"\nE       AssertionError: assert 'success' == 'error'\nE         \nE         - error\nE         + success\n\n..\\..\\..\\..\\evals\\hidden_tests\\test_filesystem_permission_migration.py:16: AssertionError\n=========================== short test summary info ===========================\nFAILED ..\\..\\..\\..\\evals\\hidden_tests\\test_filesystem_permission_migration.py::test_secret_read_is_denied\nFAILED ..\\..\\..\\..\\evals\\hidden_tests\\test_filesystem_permission_migration.py::test_secret_write_is_denied\n2 failed, 1 passed in 1.21s"
+    },
+    {
+      "success": true,
+      "exit_code": 0,
+      "output": "...                                                                      [100%]\n3 passed in 0.79s"
+    }
+  ],
+  "events": [
+    {
+      "schema_version": "event.v1",
+      "event": "run_started",
+      "timestamp": "2026-11-10T06:11:59.434823+00:00",
+      "run_id": "20261110T061159Z-2a38231f",
+      "task_id": "filesystem-permission-migration-v1",
+      "model_mode": "offline"
+    },
+    {
+      "schema_version": "event.v1",
+      "event": "workspace_created",
+      "timestamp": "2026-11-10T06:11:59.450318+00:00",
+      "workspace": "D:\\langgraph_learning\\agent-harness-lab\\runs\\migration-permissions\\20261110T061159Z-2a38231f\\workspace",
+      "file_count": 2
+    },
+    {
+      "schema_version": "event.v1",
+      "event": "agent_started",
+      "timestamp": "2026-11-10T06:11:59.526723+00:00",
+      "model": "fake-offline",
+      "source_module": "libs\\deepagents\\deepagents\\middleware\\filesystem.py"
+    },
+    {
+      "schema_version": "event.v1",
+      "event": "test_run",
+      "timestamp": "2026-11-10T06:12:02.210700+00:00",
+      "attempt": 1,
+      "success": false,
+      "exit_code": 1,
+      "output": "FF.                                                                      [100%]\n================================== FAILURES ===================================\n_________________________ test_secret_read_is_denied __________________________\n\n    def test_secret_read_is_denied() -> None:\n        result = permission_app.check_read(\"/secrets/key.txt\")\n    \n>       assert result[\"status\"] == \"error\"\nE       AssertionError: assert 'success' == 'error'\nE         \nE         - error\nE         + success\n\n..\\..\\..\\..\\evals\\hidden_tests\\test_filesystem_permission_migration.py:9: AssertionError\n_________________________ test_secret_write_is_denied _________________________\n\n    def test_secret_write_is_denied() -> None:\n        result = permission_app.check_write(\"/secrets/key.txt\")\n    \n>       assert result[\"status\"] == \"error\"\nE       AssertionError: assert 'success' == 'error'\nE         \nE         - error\nE         + success\n\n..\\..\\..\\..\\evals\\hidden_tests\\test_filesystem_permission_migration.py:16: AssertionError\n=========================== short test summary info ===========================\nFAILED ..\\..\\..\\..\\evals\\hidden_tests\\test_filesystem_permission_migration.py::test_secret_read_is_denied\nFAILED ..\\..\\..\\..\\evals\\hidden_tests\\test_filesystem_permission_migration.py::test_secret_write_is_denied\n2 failed, 1 passed in 1.21s"
+    },
+    {
+      "schema_version": "event.v1",
+      "event": "policy_decision",
+      "timestamp": "2026-11-10T06:12:02.210700+00:00",
+      "decision": "allow",
+      "tool": "run_tests",
+      "reason": "baseline test completed",
+      "call_index": 1
+    },
+    {
+      "schema_version": "event.v1",
+      "event": "recovery_failure",
+      "timestamp": "2026-11-10T06:12:02.210700+00:00",
+      "tool": "run_tests",
+      "category": "tool_error",
+      "attempt": 1,
+      "error": "{\"success\": false, \"exit_code\": 1, \"output\": \"FF.                                                                      [100%]\\n================================== FAILURES ===================================\\n_________________________ test_secret_read_is_denied __________________________\\n\\n    def test_secret_read_is_denied() -> None:\\n        result = permission_app.check_read(\\\"/secrets/key.txt\\\")\\n    \\n>       assert result[\\\"status\\\"] == \\\"error\\\"\\nE       AssertionError: assert 'success' ="
+    },
+    {
+      "schema_version": "event.v1",
+      "event": "recovery_terminal",
+      "timestamp": "2026-11-10T06:12:02.210700+00:00",
+      "tool": "run_tests",
+      "category": "tool_error"
+    },
+    {
+      "schema_version": "event.v1",
+      "event": "policy_decision",
+      "timestamp": "2026-11-10T06:12:02.217700+00:00",
+      "decision": "allow",
+      "tool": "edit_file",
+      "reason": "policy checks passed",
+      "call_index": 2
+    },
+    {
+      "schema_version": "event.v1",
+      "event": "recovery_success",
+      "timestamp": "2026-11-10T06:12:02.220708+00:00",
+      "tool": "edit_file",
+      "attempt": 1
+    },
+    {
+      "schema_version": "event.v1",
+      "event": "test_run",
+      "timestamp": "2026-11-10T06:12:04.482447+00:00",
+      "attempt": 2,
+      "success": true,
+      "exit_code": 0,
+      "output": "...                                                                      [100%]\n3 passed in 0.79s"
+    },
+    {
+      "schema_version": "event.v1",
+      "event": "policy_decision",
+      "timestamp": "2026-11-10T06:12:04.482447+00:00",
+      "decision": "allow",
+      "tool": "run_tests",
+      "reason": "baseline test completed",
+      "call_index": 3
+    },
+    {
+      "schema_version": "event.v1",
+      "event": "recovery_success",
+      "timestamp": "2026-11-10T06:12:04.482447+00:00",
+      "tool": "run_tests",
+      "attempt": 1
+    },
+    {
+      "schema_version": "event.v1",
+      "event": "agent_finished",
+      "timestamp": "2026-11-10T06:12:04.487533+00:00",
+      "message_count": 8
+    },
+    {
+      "schema_version": "event.v1",
+      "event": "diff_scope_checked",
+      "timestamp": "2026-11-10T06:12:04.493510+00:00",
+      "changed_files": [
+        "filesystem.py"
+      ],
+      "expected_files": [
+        "filesystem.py"
+      ],
+      "unexpected_files": [],
+      "diff_scope_valid": true
+    },
+    {
+      "schema_version": "event.v1",
+      "event": "run_finished",
+      "timestamp": "2026-11-10T06:12:04.493510+00:00",
+      "completed": true,
+      "tests_passed": true,
+      "task_success": true,
+      "diff_scope_valid": true
+    }
+  ],
+  "schema_version": "run.v1",
+  "diff": "--- a/filesystem.py\n+++ b/filesystem.py\n@@ -440,7 +440,7 @@\n     validated_path: str,\n ) -> str | None:\n     \"\"\"Return an error if `validated_path` or its resolved target is denied, or it can't be resolved.\"\"\"\n-    if False:  # injected migration defect\n+    if _check_fs_permission(rules, operation, validated_path) == \"deny\":\n         return f\"Error: permission denied for {operation} on {validated_path}\"\n     return _resolved_permission_error(rules, operation, backend, validated_path)\n \n",
+  "replay": {
+    "schema_version": "replay.v1",
+    "mode": "events-only",
+    "event_count": 15,
+    "event_names": [
+      "run_started",
+      "workspace_created",
+      "agent_started",
+      "test_run",
+      "policy_decision",
+      "recovery_failure",
+      "recovery_terminal",
+      "policy_decision",
+      "recovery_success",
+      "test_run",
+      "policy_decision",
+      "recovery_success",
+      "agent_finished",
+      "diff_scope_checked",
+      "run_finished"
+    ],
+    "test_runs": 2,
+    "completed": true,
+    "tests_passed": true
+  }
+}

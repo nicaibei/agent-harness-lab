@@ -283,6 +283,14 @@ Python 模块已经正确，唯一故意错误是：
 
 当前不要把 holdout 用于 Prompt 或 Policy 调参，也不要把离线 Harness 通过率写成真实模型成功率。
 
+## 19. 当前 FilesystemMiddleware 权限迁移实验
+
+已新增真实 SDK 模块权限迁移实验：从 `D:\langgraph_learning\deepagent\libs\deepagents\deepagents\middleware\filesystem.py` 复制源码到隔离 workspace，注入 `_permission_error()` 的直接权限检查缺陷，隐藏测试位于 workspace 外，允许修改的文件只有 `filesystem.py`。
+
+离线运行 ID：`20261110T061159Z-2a38231f`。首次隐藏测试为 `2 failed, 1 passed`，Fake Model 恢复后为 `3 passed`；只修改 `filesystem.py`，无越界文件，`completed=true`、`tests_passed=true`、`diff_scope_valid=true`、`task_success=true`。完整说明见 `docs/filesystem-permission-migration-v1.md`，摘要见 `evals/reports/filesystem-permission-migration-v1.json`。
+
+真实 DeepSeek 评测尚未完成。执行命令被安全审查拒绝，原因是它会把新的真实 `FilesystemMiddleware` 源码发送到外部模型服务；少于 10 次的默认调用授权不覆盖这一具体数据外发目的地。获得针对该 payload 的明确授权后，只运行一次真实评测，并单独记录模型响应、工具调用、首次/最终测试、diff 范围和成本字段，不并入离线或普通 Recovery 分母。
+
 ## 17. 下一个对话的开场提示
 
 可以直接把下面这句话发给下一个对话：

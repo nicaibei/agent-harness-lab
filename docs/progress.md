@@ -39,6 +39,8 @@
 - Repeated `parse-duration` twice under the same configuration; all 3 runs recovered, with diff sizes from 1259 to 1346 characters and 2 exploration errors.
 - Added a repository-shaped inventory checkout fixture with configuration, package modules, and layered hidden tests; offline validation passes (`54 passed`).
 - Completed one authorized DeepSeek repository-shaped Recovery run: three layered tests failed first, three production modules changed, and all three passed on the second run (`20261107T091935Z-160b0df4`).
+- Added the FilesystemMiddleware permission migration fixture with an external hidden evaluator. The offline run (`20261110T061159Z-2a38231f`) had `2 failed, 1 passed` initially and `3 passed` after a focused `filesystem.py` repair; the diff stayed within the expected file and `task_success=true`.
+- Recorded the FilesystemMiddleware migration experiment and its evidence boundary in `docs/filesystem-permission-migration-v1.md`. A real DeepSeek run is still pending because the safety review requires payload-specific authorization for sending this new real source module to an external model service.
 
 ## Next
 
