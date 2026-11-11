@@ -289,7 +289,7 @@ Python 模块已经正确，唯一故意错误是：
 
 离线运行 ID：`20261110T061159Z-2a38231f`。首次隐藏测试为 `2 failed, 1 passed`，Fake Model 恢复后为 `3 passed`；只修改 `filesystem.py`，无越界文件，`completed=true`、`tests_passed=true`、`diff_scope_valid=true`、`task_success=true`。完整说明见 `docs/filesystem-permission-migration-v1.md`，摘要见 `evals/reports/filesystem-permission-migration-v1.json`。
 
-真实 DeepSeek 评测尚未完成。执行命令被安全审查拒绝，原因是它会把新的真实 `FilesystemMiddleware` 源码发送到外部模型服务；少于 10 次的默认调用授权不覆盖这一具体数据外发目的地。获得针对该 payload 的明确授权后，只运行一次真实评测，并单独记录模型响应、工具调用、首次/最终测试、diff 范围和成本字段，不并入离线或普通 Recovery 分母。
+真实 DeepSeek 评测已完成一次，运行 ID：`20261111T060031Z-dc32d18f`。首次隐藏测试为 `2 failed, 1 passed`，Agent 先探索并运行测试，再通过 `grep/read_file` 定位权限判断，第二次测试为 `3 passed`；只修改 `filesystem.py`，无越界文件，`completed=true`、`tests_passed=true`、`diff_scope_valid=true`、`task_success=true`。观察到 10 个模型响应和 11 个 Policy 记录的工具调用，Provider 未返回 usage，因此成本不可用。完整说明见 `docs/filesystem-permission-migration-v1.md`，真实摘要见 `evals/reports/filesystem-permission-migration-real-v1.json`。该结果只作为一个真实 SDK 迁移样本，不并入普通 Recovery 成功率。
 
 ## 17. 下一个对话的开场提示
 

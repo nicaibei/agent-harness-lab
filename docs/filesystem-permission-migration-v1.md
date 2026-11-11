@@ -46,8 +46,25 @@
 
 ## 真实评测状态
 
-真实 DeepSeek 运行尚未完成。执行命令被自动安全审查阻止，因为它会把新的真实 `FilesystemMiddleware` 源码发送到外部模型服务。当前离线结果不能替代真实模型结果，也不计入真实模型 Recovery 成功率。
+真实 DeepSeek 运行已完成一次。运行 ID：`20261111T060031Z-dc32d18f`。
+
+| 指标 | 结果 |
+| --- | --- |
+| 模型 | `deepseek-flash` |
+| 模型响应数 | `10` |
+| Policy 记录的工具调用 | `11` |
+| 首次隐藏测试 | `2 failed, 1 passed` |
+| 修复后隐藏测试 | `3 passed` |
+| 实际修改文件 | `filesystem.py` |
+| 越界修改 | 无 |
+| `completed` | `true` |
+| `tests_passed` | `true` |
+| `diff_scope_valid` | `true` |
+| `task_success` | `true` |
+| 成本 | Provider 未返回 usage，无法记录 |
+
+真实 Agent 先列出并读取隔离 workspace 中的源码，然后运行隐藏测试观察失败，再用 `grep` 和 `read_file` 定位 `_permission_error()` 的权限判断，最后只修复该判断并重新测试。运行产物保留在 `runs/migration-permissions/20261111T060031Z-dc32d18f/`，摘要见 `evals/reports/filesystem-permission-migration-real-v1.json`。
 
 ## 学习结论与限制
 
-本实验说明权限迁移的成功判定必须同时看隐藏行为、最终测试和修改范围；只看 `completed=true` 或 diff 都不够。离线 Fake Model 证明 Harness 的判定链路和外部隐藏测试设计可用，但不能证明 DeepSeek 能自行定位该真实模块问题。当前样本只有一个故障和一次离线运行，不能外推到其他权限规则或大型仓库。
+本实验说明权限迁移的成功判定必须同时看隐藏行为、最终测试和修改范围；只看 `completed=true` 或 diff 都不够。离线 Fake Model 证明 Harness 的判定链路和外部隐藏测试设计可用，真实 DeepSeek 运行进一步证明 Agent 能在这个真实模块上完成一次受控定位和修复。当前样本只有一个故障和一次真实运行，不能外推到其他权限规则或大型仓库；成本字段也因 Provider usage 缺失而不可用。
