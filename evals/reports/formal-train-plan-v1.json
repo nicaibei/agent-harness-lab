@@ -1,0 +1,273 @@
+{
+  "schema_version": "formal-plan.v1",
+  "manifest": "evals/formal_tasks.json",
+  "task_count": 16,
+  "split_counts": {
+    "train": 16
+  },
+  "execution_mode_counts": {
+    "agent_model": 14,
+    "harness_offline": 2
+  },
+  "model_calls_scheduled": 14,
+  "tasks": [
+    {
+      "task_id": "calculator-add-floats",
+      "split": "train",
+      "strata": "baseline",
+      "category": "calculator",
+      "difficulty": "small",
+      "execution_mode": "agent_model",
+      "model_required": true,
+      "project": "examples/tiny_python_project",
+      "evaluator": "examples/tiny_python_project/test_calculator.py",
+      "offline_target": null,
+      "expected_files": [
+        "test_calculator.py"
+      ],
+      "manifest_status": "real_validated"
+    },
+    {
+      "task_id": "calculator-subtract-negative",
+      "split": "train",
+      "strata": "baseline",
+      "category": "calculator",
+      "difficulty": "small",
+      "execution_mode": "agent_model",
+      "model_required": true,
+      "project": "examples/tiny_python_project",
+      "evaluator": "examples/tiny_python_project/test_calculator.py",
+      "offline_target": null,
+      "expected_files": [
+        "test_calculator.py"
+      ],
+      "manifest_status": "real_validated"
+    },
+    {
+      "task_id": "calculator-divide-fraction",
+      "split": "train",
+      "strata": "baseline",
+      "category": "calculator",
+      "difficulty": "small",
+      "execution_mode": "agent_model",
+      "model_required": true,
+      "project": "examples/tiny_python_project",
+      "evaluator": "examples/tiny_python_project/test_calculator.py",
+      "offline_target": null,
+      "expected_files": [
+        "test_calculator.py"
+      ],
+      "manifest_status": "real_validated"
+    },
+    {
+      "task_id": "calculator-add-negative-mixed",
+      "split": "train",
+      "strata": "baseline",
+      "category": "calculator",
+      "difficulty": "small",
+      "execution_mode": "agent_model",
+      "model_required": true,
+      "project": "examples/tiny_python_project",
+      "evaluator": "examples/tiny_python_project/test_calculator.py",
+      "offline_target": null,
+      "expected_files": [
+        "test_calculator.py"
+      ],
+      "manifest_status": "real_validated"
+    },
+    {
+      "task_id": "calculator-subtract-floats",
+      "split": "train",
+      "strata": "baseline",
+      "category": "calculator",
+      "difficulty": "small",
+      "execution_mode": "agent_model",
+      "model_required": true,
+      "project": "examples/tiny_python_project",
+      "evaluator": "examples/tiny_python_project/test_calculator.py",
+      "offline_target": null,
+      "expected_files": [
+        "test_calculator.py"
+      ],
+      "manifest_status": "real_validated"
+    },
+    {
+      "task_id": "calculator-divide-negative",
+      "split": "train",
+      "strata": "baseline",
+      "category": "calculator",
+      "difficulty": "small",
+      "execution_mode": "agent_model",
+      "model_required": true,
+      "project": "examples/tiny_python_project",
+      "evaluator": "examples/tiny_python_project/test_calculator.py",
+      "offline_target": null,
+      "expected_files": [
+        "test_calculator.py"
+      ],
+      "manifest_status": "real_validated"
+    },
+    {
+      "task_id": "calculator-divide-zero-numerator",
+      "split": "train",
+      "strata": "baseline",
+      "category": "calculator",
+      "difficulty": "small",
+      "execution_mode": "agent_model",
+      "model_required": true,
+      "project": "examples/tiny_python_project",
+      "evaluator": "examples/tiny_python_project/test_calculator.py",
+      "offline_target": null,
+      "expected_files": [
+        "test_calculator.py"
+      ],
+      "manifest_status": "real_validated"
+    },
+    {
+      "task_id": "calculator-add-rejects-text",
+      "split": "train",
+      "strata": "baseline",
+      "category": "calculator",
+      "difficulty": "small",
+      "execution_mode": "agent_model",
+      "model_required": true,
+      "project": "examples/tiny_python_project",
+      "evaluator": "examples/tiny_python_project/test_calculator.py",
+      "offline_target": null,
+      "expected_files": [
+        "calculator.py",
+        "test_calculator.py"
+      ],
+      "manifest_status": "real_validated"
+    },
+    {
+      "task_id": "calculator-multiply",
+      "split": "train",
+      "strata": "baseline",
+      "category": "calculator",
+      "difficulty": "small",
+      "execution_mode": "agent_model",
+      "model_required": true,
+      "project": "examples/tiny_python_project",
+      "evaluator": "examples/tiny_python_project/test_calculator.py",
+      "offline_target": null,
+      "expected_files": [
+        "calculator.py",
+        "test_calculator.py"
+      ],
+      "manifest_status": "real_validated"
+    },
+    {
+      "task_id": "calculator-subtract-zero",
+      "split": "train",
+      "strata": "baseline",
+      "category": "calculator",
+      "difficulty": "small",
+      "execution_mode": "agent_model",
+      "model_required": true,
+      "project": "examples/tiny_python_project",
+      "evaluator": "examples/tiny_python_project/test_calculator.py",
+      "offline_target": null,
+      "expected_files": [
+        "test_calculator.py"
+      ],
+      "manifest_status": "real_validated"
+    },
+    {
+      "task_id": "real-recovery-csv-row",
+      "split": "train",
+      "strata": "recovery",
+      "category": "structured_text",
+      "difficulty": "small",
+      "execution_mode": "agent_model",
+      "model_required": true,
+      "project": "examples/recovery_csv_project",
+      "evaluator": "evals/hidden_tests/test_row.py",
+      "offline_target": null,
+      "expected_files": [
+        "row.py"
+      ],
+      "manifest_status": "real_validated_once"
+    },
+    {
+      "task_id": "real-recovery-stable-unique",
+      "split": "train",
+      "strata": "recovery",
+      "category": "sequence_logic",
+      "difficulty": "small",
+      "execution_mode": "agent_model",
+      "model_required": true,
+      "project": "examples/recovery_unique_project",
+      "evaluator": "evals/hidden_tests/test_unique.py",
+      "offline_target": null,
+      "expected_files": [
+        "unique.py"
+      ],
+      "manifest_status": "real_validated_once"
+    },
+    {
+      "task_id": "real-recovery-safe-divide",
+      "split": "train",
+      "strata": "recovery",
+      "category": "error_handling",
+      "difficulty": "small",
+      "execution_mode": "agent_model",
+      "model_required": true,
+      "project": "examples/recovery_safe_math_project",
+      "evaluator": "evals/hidden_tests/test_safe_math.py",
+      "offline_target": null,
+      "expected_files": [
+        "safe_math.py"
+      ],
+      "manifest_status": "real_validated_once"
+    },
+    {
+      "task_id": "real-recovery-parse-duration",
+      "split": "train",
+      "strata": "recovery",
+      "category": "unit_parsing",
+      "difficulty": "medium",
+      "execution_mode": "agent_model",
+      "model_required": true,
+      "project": "examples/recovery_duration_project",
+      "evaluator": "evals/hidden_tests/test_duration.py",
+      "offline_target": null,
+      "expected_files": [
+        "duration.py"
+      ],
+      "manifest_status": "real_validated_once"
+    },
+    {
+      "task_id": "checkpoint-resume-v1",
+      "split": "train",
+      "strata": "runtime",
+      "category": "interrupt_resume",
+      "difficulty": "medium",
+      "execution_mode": "harness_offline",
+      "model_required": false,
+      "project": "examples/tiny_python_project",
+      "evaluator": "evals/checkpoint_resume.py",
+      "offline_target": "tests/test_checkpoint_resume_experiment.py::test_checkpoint_resume_runner_records_waiting_and_resume",
+      "expected_files": [
+        "calculator.py"
+      ],
+      "manifest_status": "validated_offline"
+    },
+    {
+      "task_id": "checkpoint-resume-v2-process-restart",
+      "split": "train",
+      "strata": "runtime",
+      "category": "process_restart_recovery",
+      "difficulty": "large",
+      "execution_mode": "harness_offline",
+      "model_required": false,
+      "project": "examples/tiny_python_project",
+      "evaluator": "evals/checkpoint_resume.py",
+      "offline_target": "tests/test_checkpoint_resume_experiment.py::test_checkpoint_resume_survives_a_process_restart",
+      "expected_files": [
+        "calculator.py"
+      ],
+      "manifest_status": "validated_offline"
+    }
+  ]
+}

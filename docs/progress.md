@@ -42,6 +42,7 @@
 - Added the FilesystemMiddleware permission migration fixture with an external hidden evaluator. The offline run (`20261110T061159Z-2a38231f`) had `2 failed, 1 passed` initially and `3 passed` after a focused `filesystem.py` repair; the diff stayed within the expected file and `task_success=true`.
 - Recorded the FilesystemMiddleware migration experiment and its evidence boundary in `docs/filesystem-permission-migration-v1.md`.
 - Completed one explicitly authorized real DeepSeek FilesystemMiddleware permission migration run (`20261111T060031Z-dc32d18f`): first hidden tests `2 failed, 1 passed`, final tests `3 passed`, only `filesystem.py` changed, no unexpected files, and `task_success=true`. The run observed 10 model responses and 11 Policy-recorded tool calls; provider usage did not expose cost.
+- Completed the formal split audit: train plan `16` tasks (`14` model, `2` offline), holdout plan `14` tasks (`8` model, `6` offline); offline execution passed `2/2` train Runtime tasks and `6/6` holdout Security tasks with `0` model calls. The four-task real Recovery repeat batch is pending payload-specific external model authorization.
 
 ## Next
 

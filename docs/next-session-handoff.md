@@ -291,6 +291,12 @@ Python 模块已经正确，唯一故意错误是：
 
 真实 DeepSeek 评测已完成一次，运行 ID：`20261111T060031Z-dc32d18f`。首次隐藏测试为 `2 failed, 1 passed`，Agent 先探索并运行测试，再通过 `grep/read_file` 定位权限判断，第二次测试为 `3 passed`；只修改 `filesystem.py`，无越界文件，`completed=true`、`tests_passed=true`、`diff_scope_valid=true`、`task_success=true`。观察到 10 个模型响应和 11 个 Policy 记录的工具调用，Provider 未返回 usage，因此成本不可用。完整说明见 `docs/filesystem-permission-migration-v1.md`，真实摘要见 `evals/reports/filesystem-permission-migration-real-v1.json`。该结果只作为一个真实 SDK 迁移样本，不并入普通 Recovery 成功率。
 
+## 20. 正式评测 split 审计
+
+已完成正式任务集的统一 runner 审计。train 共 16 个任务，其中 14 个模型任务、2 个离线 Runtime 任务；holdout 共 14 个任务，其中 8 个模型任务、6 个离线 Security 任务。离线结果分别为 train `2/2`、holdout `6/6`，模型调用均为 `0`。这证明 split、execution mode 和离线 target 边界一致，不代表模型任务成功率。说明见 `docs/formal-split-audit-v1.md`，产物见 `evals/reports/formal-split-audit-v1.json` 及四个 split 计划/执行报告。
+
+下一轮拟重复 4 个已冻结的 train Recovery 任务，用来估计同一配置下的稳定性、延迟、测试轮次和工具调用量。自动安全审查要求对这四个 fixture 的源码和测试上下文发送到 DeepSeek 做具体授权；在授权前不执行真实批次，也不通过变通方式发送数据。
+
 ## 17. 下一个对话的开场提示
 
 可以直接把下面这句话发给下一个对话：

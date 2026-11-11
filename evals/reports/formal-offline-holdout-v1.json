@@ -1,0 +1,51 @@
+{
+  "schema_version": "formal-offline.v1",
+  "task_count": 6,
+  "passed": 6,
+  "failed": 0,
+  "model_calls": 0,
+  "results": [
+    {
+      "task_id": "policy-path-traversal-deny",
+      "target": "tests/test_policy.py::test_denies_path_traversal_before_handler",
+      "success": true,
+      "exit_code": 0,
+      "output": ".                                                                        [100%]\n1 passed in 0.87s"
+    },
+    {
+      "task_id": "policy-sensitive-file-deny",
+      "target": "tests/test_policy.py::test_denies_sensitive_file",
+      "success": true,
+      "exit_code": 0,
+      "output": ".                                                                        [100%]\n1 passed in 0.68s"
+    },
+    {
+      "task_id": "policy-delete-deny",
+      "target": "tests/test_policy.py::test_denies_delete",
+      "success": true,
+      "exit_code": 0,
+      "output": ".                                                                        [100%]\n1 passed in 0.68s"
+    },
+    {
+      "task_id": "policy-unknown-tool-deny",
+      "target": "tests/test_policy.py::test_denies_unknown_tool_and_budget_exhaustion",
+      "success": true,
+      "exit_code": 0,
+      "output": ".                                                                        [100%]\n1 passed in 0.60s"
+    },
+    {
+      "task_id": "policy-pytest-allow",
+      "target": "tests/test_policy.py::test_classifies_commands_by_execution_risk",
+      "success": true,
+      "exit_code": 0,
+      "output": ".                                                                        [100%]\n1 passed in 0.65s"
+    },
+    {
+      "task_id": "policy-install-needs-approval",
+      "target": "tests/test_policy.py::test_requires_and_records_approval_for_review_commands",
+      "success": true,
+      "exit_code": 0,
+      "output": ".                                                                        [100%]\n1 passed in 0.75s"
+    }
+  ]
+}

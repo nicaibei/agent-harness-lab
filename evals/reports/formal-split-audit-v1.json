@@ -1,0 +1,28 @@
+{
+  "schema_version": "formal-split-audit.v1",
+  "manifest": "evals/formal_tasks.json",
+  "task_count": 30,
+  "splits": {
+    "train": {
+      "task_count": 16,
+      "model_tasks": 14,
+      "offline_tasks": 2,
+      "offline_passed": 2,
+      "offline_failed": 0,
+      "model_calls": 0
+    },
+    "holdout": {
+      "task_count": 14,
+      "model_tasks": 8,
+      "offline_tasks": 6,
+      "offline_passed": 6,
+      "offline_failed": 0,
+      "model_calls": 0
+    }
+  },
+  "offline_model_calls": 0,
+  "split_integrity": true,
+  "offline_targets_present": true,
+  "holdout_used_for_tuning": false,
+  "conclusion": "Harness split and offline execution boundaries are valid; model-task success rates remain unmeasured."
+}

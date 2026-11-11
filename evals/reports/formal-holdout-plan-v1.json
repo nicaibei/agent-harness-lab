@@ -1,0 +1,225 @@
+{
+  "schema_version": "formal-plan.v1",
+  "manifest": "evals/formal_tasks.json",
+  "task_count": 14,
+  "split_counts": {
+    "holdout": 14
+  },
+  "execution_mode_counts": {
+    "agent_model": 8,
+    "harness_offline": 6
+  },
+  "model_calls_scheduled": 8,
+  "tasks": [
+    {
+      "task_id": "real-recovery-order-total",
+      "split": "holdout",
+      "strata": "cross_file",
+      "category": "cross_file_contract",
+      "difficulty": "medium",
+      "execution_mode": "agent_model",
+      "model_required": true,
+      "project": "examples/recovery_order_project",
+      "evaluator": "evals/hidden_tests/test_order_total.py",
+      "offline_target": null,
+      "expected_files": [
+        "order_parser.py",
+        "order_total.py"
+      ],
+      "manifest_status": "real_validated"
+    },
+    {
+      "task_id": "real-recovery-temperature-report",
+      "split": "holdout",
+      "strata": "cross_file",
+      "category": "cross_file_contract",
+      "difficulty": "medium",
+      "execution_mode": "agent_model",
+      "model_required": true,
+      "project": "examples/recovery_temperature_project",
+      "evaluator": "evals/hidden_tests/test_temperature_report.py",
+      "offline_target": null,
+      "expected_files": [
+        "temperature_parser.py",
+        "temperature_report.py"
+      ],
+      "manifest_status": "real_validated"
+    },
+    {
+      "task_id": "real-recovery-inventory-checkout",
+      "split": "holdout",
+      "strata": "repository_integration",
+      "category": "repository_integration",
+      "difficulty": "large",
+      "execution_mode": "agent_model",
+      "model_required": true,
+      "project": "examples/recovery_inventory_repo",
+      "evaluator": "evals/hidden_tests/test_inventory_repo.py",
+      "offline_target": null,
+      "expected_files": [
+        "inventory_app/settings.py",
+        "inventory_app/catalog.py",
+        "inventory_app/checkout.py"
+      ],
+      "manifest_status": "real_validated_once"
+    },
+    {
+      "task_id": "real-recovery-inventory-config",
+      "split": "holdout",
+      "strata": "repository_integration",
+      "category": "repository_integration",
+      "difficulty": "medium",
+      "execution_mode": "agent_model",
+      "model_required": true,
+      "project": "examples/recovery_inventory_config_repo",
+      "evaluator": "evals/hidden_tests/test_inventory_repo.py",
+      "offline_target": null,
+      "expected_files": [
+        "config/checkout.json"
+      ],
+      "manifest_status": "real_validated_once"
+    },
+    {
+      "task_id": "real-recovery-startup-import",
+      "split": "holdout",
+      "strata": "repository_integration",
+      "category": "startup_recovery",
+      "difficulty": "medium",
+      "execution_mode": "agent_model",
+      "model_required": true,
+      "project": "examples/recovery_startup_repo",
+      "evaluator": "evals/hidden_tests/test_startup_repo.py",
+      "offline_target": null,
+      "expected_files": [
+        "service_app/__init__.py"
+      ],
+      "manifest_status": "real_validated_once"
+    },
+    {
+      "task_id": "real-recovery-missing-dependency",
+      "split": "holdout",
+      "strata": "environment",
+      "category": "environment_failure",
+      "difficulty": "medium",
+      "execution_mode": "agent_model",
+      "model_required": true,
+      "project": "examples/recovery_missing_dependency_repo",
+      "evaluator": "evals/hidden_tests/test_missing_dependency_repo.py",
+      "offline_target": null,
+      "expected_files": [],
+      "manifest_status": "real_validated"
+    },
+    {
+      "task_id": "real-recovery-missing-dependency-install",
+      "split": "holdout",
+      "strata": "environment",
+      "category": "environment_recovery",
+      "difficulty": "medium",
+      "execution_mode": "agent_model",
+      "model_required": true,
+      "project": "examples/recovery_dependency_install_repo",
+      "evaluator": "evals/hidden_tests/test_dependency_install_repo.py",
+      "offline_target": null,
+      "expected_files": [],
+      "manifest_status": "real_validated"
+    },
+    {
+      "task_id": "real-recovery-dependency-version-conflict",
+      "split": "holdout",
+      "strata": "environment",
+      "category": "dependency_conflict",
+      "difficulty": "medium",
+      "execution_mode": "agent_model",
+      "model_required": true,
+      "project": "examples/recovery_dependency_conflict_repo",
+      "evaluator": "evals/hidden_tests/test_dependency_conflict_repo.py",
+      "offline_target": null,
+      "expected_files": [],
+      "manifest_status": "real_validated"
+    },
+    {
+      "task_id": "policy-path-traversal-deny",
+      "split": "holdout",
+      "strata": "security",
+      "category": "policy",
+      "difficulty": "small",
+      "execution_mode": "harness_offline",
+      "model_required": false,
+      "project": ".",
+      "evaluator": "tests/test_policy.py",
+      "offline_target": "tests/test_policy.py::test_denies_path_traversal_before_handler",
+      "expected_files": [],
+      "manifest_status": "validated_offline"
+    },
+    {
+      "task_id": "policy-sensitive-file-deny",
+      "split": "holdout",
+      "strata": "security",
+      "category": "policy",
+      "difficulty": "small",
+      "execution_mode": "harness_offline",
+      "model_required": false,
+      "project": ".",
+      "evaluator": "tests/test_policy.py",
+      "offline_target": "tests/test_policy.py::test_denies_sensitive_file",
+      "expected_files": [],
+      "manifest_status": "validated_offline"
+    },
+    {
+      "task_id": "policy-delete-deny",
+      "split": "holdout",
+      "strata": "security",
+      "category": "policy",
+      "difficulty": "small",
+      "execution_mode": "harness_offline",
+      "model_required": false,
+      "project": ".",
+      "evaluator": "tests/test_policy.py",
+      "offline_target": "tests/test_policy.py::test_denies_delete",
+      "expected_files": [],
+      "manifest_status": "validated_offline"
+    },
+    {
+      "task_id": "policy-unknown-tool-deny",
+      "split": "holdout",
+      "strata": "security",
+      "category": "policy",
+      "difficulty": "small",
+      "execution_mode": "harness_offline",
+      "model_required": false,
+      "project": ".",
+      "evaluator": "tests/test_policy.py",
+      "offline_target": "tests/test_policy.py::test_denies_unknown_tool_and_budget_exhaustion",
+      "expected_files": [],
+      "manifest_status": "validated_offline"
+    },
+    {
+      "task_id": "policy-pytest-allow",
+      "split": "holdout",
+      "strata": "security",
+      "category": "policy",
+      "difficulty": "small",
+      "execution_mode": "harness_offline",
+      "model_required": false,
+      "project": ".",
+      "evaluator": "tests/test_policy.py",
+      "offline_target": "tests/test_policy.py::test_classifies_commands_by_execution_risk",
+      "expected_files": [],
+      "manifest_status": "validated_offline"
+    },
+    {
+      "task_id": "policy-install-needs-approval",
+      "split": "holdout",
+      "strata": "security",
+      "category": "policy",
+      "difficulty": "small",
+      "execution_mode": "harness_offline",
+      "model_required": false,
+      "project": ".",
+      "evaluator": "tests/test_policy.py",
+      "offline_target": "tests/test_policy.py::test_requires_and_records_approval_for_review_commands",
+      "expected_files": [],
+      "manifest_status": "validated_offline"
+    }
+  ]
+}
