@@ -52,3 +52,13 @@
 | `calculator-divide-fraction` | `20261108T081509Z-d73a68d7` | 5 passed | 322 | 10.558s | 18 |
 
 三个任务都只修改了预期的 `test_calculator.py`，没有 Policy 拒绝或执行错误。第三个任务的独立摘要见 [formal-model-calculator-divide-fraction-v1.json](../evals/reports/formal-model-calculator-divide-fraction-v1.json)；前两个摘要见 [formal-model-calculator-add-floats-v1.json](../evals/reports/formal-model-calculator-add-floats-v1.json) 和 [formal-model-calculator-subtract-negative-v1.json](../evals/reports/formal-model-calculator-subtract-negative-v1.json)。Provider usage 没有返回可记录的 token/cost，因此 `cost=null`，这三次 train 冒烟运行不能代表完整 Baseline 成功率，也不允许外推到 holdout。
+
+## train Recovery 重复批次 v1
+
+2026-11-11，四项已有 train Recovery 任务各通过 formal runner 新增一次真实 DeepSeek 运行。CSV 首次 `2 failed`，其余三项首次 `1 failed, 1 passed`，最终均 `2 passed`；事后审计确认只修改各自预期实现文件。四项均尝试在首次测试前修改，均被 baseline gate 拒绝，不能把结果描述成模型主动遵守流程。
+
+本轮 24 次工具尝试中 4 次被拒绝，平均 runner 耗时 16.174s。实际模型请求数、token 和成本未采集，不能把 `model_calls_requested=1` 解释为一次 API 请求。证据见 [批次报告](../evals/reports/formal-train-recovery-repeat-v1.json)，教学复盘见 [实验说明](train-recovery-repeat-v1.md)。
+
+统一 runner 目前覆盖过 7 个不同 train 模型任务（3 个 Baseline 冒烟任务、4 个 Recovery 任务），不是统一批次的 14 项 train 完整评测。本轮不重算原矩阵，也不合并历史运行来宣称稳定性。
+
+清单中的 holdout 包含历史上已经运行和检查过的 fixture；它们可以保持后续不用于调参，但不能作为完全未见数据来主张无偏泛化。新的未见验证应单独版本化，不在本轮静默改变冻结清单。
