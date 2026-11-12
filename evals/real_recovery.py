@@ -32,8 +32,10 @@ from agent_app.baseline import (
     _snapshot_files,
 )
 from harness.checkpoint import replay_events, summarize_checkpoints
+from harness.file_scope import file_changes, snapshot_file_hashes
 from harness.policy import PolicyMiddleware
 from harness.recovery import RecoveryMiddleware
+from harness.usage import ModelUsageRecorder
 
 
 RECOVERY_PROJECT = REPOSITORY_ROOT / "examples" / "recovery_python_project"
@@ -525,6 +527,7 @@ def run_recovery_task(
     _record_event(events, "run_started", run_id=run_id, task_id=case.task_id)
     shutil.copytree(source, workspace, ignore=COPY_IGNORE)
     before = _snapshot_files(workspace)
+    before_hashes = snapshot_file_hashes(workspace)
     _record_event(events, "workspace_created", workspace=str(workspace), file_count=len(before))
 
     def record_recovery_event(recovery_event: dict[str, Any]) -> None:
@@ -540,7 +543,8 @@ def run_recovery_task(
     )
     recovery = RecoveryMiddleware(on_event=record_recovery_event)
     checkpointer = InMemorySaver()
-    run_config = {"configurable": {"thread_id": run_id}}
+    usage = ModelUsageRecorder()
+    run_config = {"configurable": {"thread_id": run_id}, "callbacks": [usage]}
     extra_pythonpath: list[Path] = (
         [case.preloaded_dependency_path]
         if case.preloaded_dependency_path is not None
@@ -606,6 +610,11 @@ def run_recovery_task(
         _record_event(events, "agent_error", error=execution_error)
 
     after = _snapshot_files(workspace) if workspace.is_dir() else before
+    try:
+        changes = file_changes(before_hashes, snapshot_file_hashes(workspace))
+    except OSError as error:
+        changes = {"schema_version": "file-changes.v1", "status": "unavailable"}
+        execution_error = execution_error or f"File snapshot failed: {error}"
     diff = _build_diff(before, after)
     messages = response.get("messages", [])
     final_response = messages[-1].content if messages else ""
@@ -664,6 +673,8 @@ def run_recovery_task(
         "base_url": base_url,
         "source_project": str(source),
         "workspace": str(workspace),
+        "file_changes": changes,
+        "model_usage": usage.summary(),
         "hidden_evaluator": str(hidden_tests),
         "final_response": final_response,
         "execution_error": execution_error,

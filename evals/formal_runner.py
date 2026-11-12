@@ -13,6 +13,7 @@ from time import perf_counter
 from typing import Literal
 
 from evals.formal_task_manifest import FormalTaskSpec, load_manifest
+from harness.file_scope import assess_file_scope
 
 
 PLAN_SCHEMA_VERSION = "formal-plan.v1"
@@ -133,6 +134,7 @@ def run_model_task(task_id: str) -> dict[str, object]:
     finished_at = datetime.now(UTC)
     report_path = run_dir / "run.json"
     report = json.loads(report_path.read_text(encoding="utf-8"))
+    assessment = _assess_model_result(task, report)
     return {
         "schema_version": MODEL_RESULT_SCHEMA_VERSION,
         "task_id": task.task_id,
@@ -144,6 +146,8 @@ def run_model_task(task_id: str) -> dict[str, object]:
         "finished_at": finished_at.isoformat(),
         "latency_seconds": round(elapsed_seconds, 3),
         "model_calls_requested": 1,
+        "model_calls_requested_semantics": "legacy field: agent task invocations, not API requests",
+        "task_runs_requested": 1,
         "completed": report.get("completed"),
         "tests_passed": report.get("tests_passed"),
         "execution_error": report.get("execution_error"),
@@ -151,9 +155,37 @@ def run_model_task(task_id: str) -> dict[str, object]:
         "diff_chars": len(report.get("diff", "")) if isinstance(report.get("diff"), str) else 0,
         "test_run_count": len(report.get("test_runs", [])) if isinstance(report.get("test_runs"), list) else 0,
         "event_count": len(report.get("events", [])) if isinstance(report.get("events"), list) else 0,
+        **assessment,
+        "model_usage": report.get("model_usage"),
         "cost": None,
-        "cost_status": "provider_usage_not_recorded",
+        "cost_status": "pricing_not_configured" if report.get("model_usage") else "not_collected_by_runner",
     }
+
+
+def _assess_model_result(task: FormalTaskSpec, report: dict[str, object]) -> dict[str, object]:
+    """Combine task outcome with trusted workspace change evidence."""
+    scope = assess_file_scope(report.get("file_changes"), task.expected_files)
+    test_runs = report.get("test_runs", [])
+    first = test_runs[0] if isinstance(test_runs, list) and test_runs else None
+    if isinstance(first, str):
+        try:
+            first = json.loads(first)
+        except json.JSONDecodeError:
+            first = None
+    first_failed = first.get("success") is False if isinstance(first, dict) else None
+    required = (
+        report.get("completed") is True
+        and report.get("execution_error") is None
+        and report.get("tests_passed") is True
+    )
+    if task.strata == "recovery":
+        required = required and first_failed is True
+    success: bool | None = False
+    if required:
+        success = None if scope["diff_scope_valid"] is None else (
+            scope["diff_scope_valid"] is True and bool(scope["changed_files"])
+        )
+    return {**scope, "first_test_failed": first_failed, "task_success": success}
 
 
 def write_plan(plan: dict[str, object], output: Path) -> Path:
@@ -194,7 +226,10 @@ def main() -> None:
         result = run_model_task(args.run_model)
         output = write_plan(result, args.output)
         print(f"Model result: {output}")
-        print(f"Task: {result['task_id']}; tests_passed: {result['tests_passed']}")
+        print(
+            f"Task: {result['task_id']}; tests_passed: {result['tests_passed']}; "
+            f"task_success: {result['task_success']}; diff_scope_valid: {result['diff_scope_valid']}"
+        )
         return
     plan = build_plan(split=args.split)
     output = write_plan(plan, args.output)

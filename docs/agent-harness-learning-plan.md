@@ -1,6 +1,6 @@
 # Agent Harness 工程师学习与求职项目计划 v2
 
-> 更新时间：2026-11-08
+> 更新时间：2026-11-12
 > 当前执行版本：v2
 > 目标周期：2026-11-08 至 2027-04-15
 > 求职方向：Agent Harness Engineer、Agent Engineer、Agent Platform Engineer、AI Infrastructure Engineer、LLM Runtime Engineer
@@ -173,6 +173,9 @@
 - [x] 固定运行产物 schema 的最终版本；
 - [x] 建立 30 个任务的 train/holdout 正式评估集 v1；
 - [x] 完成 3 个 train 任务的真实模型 runner 冒烟运行；
+- [x] 完成四项 train Recovery 真实重复评测，保存首次/最终测试、Policy 拒绝及范围审计证据；
+- [x] 采集模型回调与 token usage，并把范围检查接入正式 runner（92 项离线回归；不代表底层 HTTP 次数）；
+- [ ] 单次真实 usage 冒烟，核验 provider 返回字段；价格表和成本估算单独版本化；
 - [x] 完成一次真实 SDK 模块迁移验证（CompositeBackend 路由边界）；
 - [x] 完成一次真实 DeepSeek SDK 模块迁移运行并保留独立证据；
 - [x] 完成 FilesystemMiddleware 权限边界迁移的离线真实模块实验；

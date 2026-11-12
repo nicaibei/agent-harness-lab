@@ -38,6 +38,10 @@
 
 常见可选字段包括 `started_at`、`finished_at`、`model`、`base_url`、`outcome`、`baseline_gate`、环境恢复字段和 `checkpoint`。实验可以增加场景字段，但不能改变上述字段的含义。
 
+2026-11-12 起，Baseline/Recovery 可增加 `model_usage`（`model-usage.v1`）和 `file_changes`（`file-changes.v1`）两个可选对象。前者保存模型回调观察到的调用数、usage 覆盖状态和 token 小计；后者保存工作区前后文件哈希，覆盖空文件和二进制修改。缺失字段保持未知，不迁移或改写历史记录。字段定义和限制见 [模型计量与范围判定](usage-and-scope-v1.md)。
+
+formal runner 在其独立 `formal-model-result.v1` 摘要中增加 `task_runs_requested`、`model_usage`、`changed_files`、`unexpected_files`、`diff_scope_valid` 和 `task_success`。原 `model_calls_requested` 保留，并增加语义说明为 Agent 任务调用次数。`task_success=null` 表示缺少范围证据，不能当作 true；这些可选字段不改变 `run.v1` 的必需字段含义。
+
 Checkpoint 实验历史上使用过 `production_diff`；从 schema v1 开始，评测统一读取 `diff`。旧字段可以保留用于阅读，但不再作为机器判定入口。
 
 ## 事件约定

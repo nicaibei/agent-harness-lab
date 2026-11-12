@@ -49,3 +49,53 @@ def test_model_task_adapter_runs_one_baseline_task_without_retry(tmp_path, monke
     assert calls[0][1] == "calculator-add-floats"
     assert result["model_calls_requested"] == 1
     assert result["tests_passed"] is True
+    assert result["task_success"] is None
+    assert result["diff_scope_valid"] is None
+    assert result["model_usage"] is None
+    assert result["cost_status"] == "not_collected_by_runner"
+
+
+def test_passing_tests_with_unlisted_empty_file_are_not_success(tmp_path, monkeypatch) -> None:
+    import json
+
+    import agent_app.baseline as baseline
+    from evals.formal_runner import run_model_task
+    from harness.file_scope import file_changes, snapshot_file_hashes
+
+    run_dir = tmp_path / "run"
+    workspace = run_dir / "workspace"
+    workspace.mkdir(parents=True)
+    (workspace / "test_calculator.py").write_text("before", encoding="utf-8")
+    before = snapshot_file_hashes(workspace)
+    (workspace / "test_calculator.py").write_text("after", encoding="utf-8")
+    (workspace / "unlisted.txt").touch()
+    report = {
+        "completed": True, "tests_passed": True, "execution_error": None,
+        "file_changes": file_changes(before, snapshot_file_hashes(workspace)),
+    }
+    (run_dir / "run.json").write_text(json.dumps(report), encoding="utf-8")
+    monkeypatch.setattr(baseline, "run_task", lambda *args, **kwargs: run_dir)
+    result = run_model_task("calculator-add-floats")
+    assert result["tests_passed"] is True
+    assert result["unexpected_files"] == ["unlisted.txt"]
+    assert result["diff_scope_valid"] is False
+    assert result["task_success"] is False
+
+
+def test_recovery_requires_first_failure_and_nonempty_allowed_change() -> None:
+    from evals.formal_runner import _assess_model_result
+    from evals.formal_task_manifest import load_manifest
+    from harness.file_scope import file_changes
+
+    task = next(item for item in load_manifest() if item.task_id == "real-recovery-csv-row")
+    report = {
+        "completed": True, "tests_passed": True, "execution_error": None,
+        "test_runs": ['{"success": false}', '{"success": true}'],
+        "file_changes": file_changes({"row.py": "old"}, {"row.py": "new"}),
+    }
+    assert _assess_model_result(task, report)["task_success"] is True
+    report["test_runs"] = ['{"success": true}']
+    assert _assess_model_result(task, report)["task_success"] is False
+    report["test_runs"] = ['{"success": false}', '{"success": true}']
+    report["file_changes"] = file_changes({"row.py": "old"}, {"row.py": "old"})
+    assert _assess_model_result(task, report)["task_success"] is False

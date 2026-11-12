@@ -23,9 +23,11 @@ from langchain_core.tools import BaseTool, tool
 from langgraph.checkpoint.memory import InMemorySaver
 
 from harness.checkpoint import replay_events, summarize_checkpoints
+from harness.file_scope import file_changes, snapshot_file_hashes
 from harness.policy import PolicyMiddleware
 from harness.recovery import RecoveryMiddleware
 from harness.schema import EVENT_SCHEMA_VERSION, normalize_replay_report, normalize_run_report
+from harness.usage import ModelUsageRecorder
 
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
@@ -212,6 +214,7 @@ def run_task(issue: str, project: Path, *, task_id: str | None = None) -> Path:
     shutil.copytree(source, workspace, ignore=COPY_IGNORE)
 
     before = _snapshot_files(workspace)
+    before_hashes = snapshot_file_hashes(workspace)
     issue_time = datetime.now(UTC).isoformat()
     _record_event(
         events,
@@ -231,7 +234,8 @@ def run_task(issue: str, project: Path, *, task_id: str | None = None) -> Path:
     )
     recovery = RecoveryMiddleware(on_event=record_recovery_event)
     checkpointer = InMemorySaver()
-    run_config = {"configurable": {"thread_id": run_id}}
+    usage = ModelUsageRecorder()
+    run_config = {"configurable": {"thread_id": run_id}, "callbacks": [usage]}
     agent = create_deep_agent(
         model=ChatOpenAI(
             model=model_name,
@@ -263,6 +267,11 @@ def run_task(issue: str, project: Path, *, task_id: str | None = None) -> Path:
     if not workspace.is_dir():
         execution_error = execution_error or "The agent workspace disappeared before the run completed."
     after = _snapshot_files(workspace) if workspace.is_dir() else before
+    try:
+        changes = file_changes(before_hashes, snapshot_file_hashes(workspace))
+    except OSError as error:
+        changes = {"schema_version": "file-changes.v1", "status": "unavailable"}
+        execution_error = execution_error or f"File snapshot failed: {error}"
     diff = _build_diff(before, after)
     messages = response.get("messages", [])
     final_response = messages[-1].content if messages else ""
@@ -314,6 +323,8 @@ def run_task(issue: str, project: Path, *, task_id: str | None = None) -> Path:
         "source_project": str(source),
         "workspace": str(workspace),
         "workspace_exists": workspace.is_dir(),
+        "file_changes": changes,
+        "model_usage": usage.summary(),
         "final_response": final_response,
         "execution_error": execution_error,
         "completed": completed,

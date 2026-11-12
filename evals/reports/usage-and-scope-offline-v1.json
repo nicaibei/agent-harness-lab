@@ -1,0 +1,54 @@
+{
+  "schema_version": "usage-scope-offline.v1",
+  "verified_on": "2026-11-12",
+  "scenario": "offline-harness-measurement",
+  "external_model_task_runs": 0,
+  "real_provider_token_usage": null,
+  "synthetic_tokens_are_provider_spend": false,
+  "full_suite": {
+    "command": ".venv/Scripts/python.exe -m pytest -q",
+    "exit_code": 0,
+    "passed": 92,
+    "elapsed_seconds": 96.04
+  },
+  "observed_offline_cases": {
+    "partial_recovery": {
+      "model": "FakeMessagesListChatModel",
+      "model_invocations": 4,
+      "responses_with_usage": 3,
+      "token_usage_status": "partial",
+      "synthetic_observed_total_tokens": 15,
+      "task_success": true
+    },
+    "later_model_failure": {
+      "model": "FailingSecondResponseModel",
+      "model_invocations": 2,
+      "model_errors": 1,
+      "token_usage_status": "partial",
+      "synthetic_observed_total_tokens": 5,
+      "task_success": false
+    },
+    "passing_tests_with_unlisted_empty_file": {
+      "tests_passed": true,
+      "unexpected_files": ["unlisted.txt"],
+      "diff_scope_valid": false,
+      "task_success": false
+    }
+  },
+  "coverage": [
+    "standard usage and provider metadata are not counted twice",
+    "missing usage differs from known zero usage",
+    "invalid and inconsistent token counts remain unavailable",
+    "prior response usage is retained after a later model failure",
+    "new empty files, binary edits and deletions are detected",
+    "unknown legacy evidence is not treated as a success",
+    "Baseline and Recovery persist callback and snapshot evidence"
+  ],
+  "limits": [
+    "No real DeepSeek usage response has been observed by this new recorder yet.",
+    "LangChain callback invocations do not measure underlying HTTP retries.",
+    "No token price table is configured; cost remains unknown.",
+    "File scope compares before and after workspace state, excluding known caches; it does not capture transient edits or replace OS isolation.",
+    "Historical model reports and their costs were not backfilled."
+  ]
+}

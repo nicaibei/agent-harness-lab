@@ -42,9 +42,24 @@
 - Added the FilesystemMiddleware permission migration fixture with an external hidden evaluator. The offline run (`20261110T061159Z-2a38231f`) had `2 failed, 1 passed` initially and `3 passed` after a focused `filesystem.py` repair; the diff stayed within the expected file and `task_success=true`.
 - Recorded the FilesystemMiddleware migration experiment and its evidence boundary in `docs/filesystem-permission-migration-v1.md`.
 - Completed one explicitly authorized real DeepSeek FilesystemMiddleware permission migration run (`20261111T060031Z-dc32d18f`): first hidden tests `2 failed, 1 passed`, final tests `3 passed`, only `filesystem.py` changed, no unexpected files, and `task_success=true`. The run observed 10 model responses and 11 Policy-recorded tool calls; provider usage did not expose cost.
-- Completed the formal split audit: train plan `16` tasks (`14` model, `2` offline), holdout plan `14` tasks (`8` model, `6` offline); offline execution passed `2/2` train Runtime tasks and `6/6` holdout Security tasks with `0` model calls. The four-task real Recovery repeat batch is pending payload-specific external model authorization.
+- Completed the formal split audit: train plan `16` tasks (`14` model, `2` offline), holdout plan `14` tasks (`8` model, `6` offline); offline execution passed `2/2` train Runtime tasks and `6/6` holdout Security tasks with `0` model calls.
 
-## Next
+## 2026-11-11 — train Recovery repeat batch
+
+- Completed four authorized DeepSeek task runs through the formal runner: CSV row, stable unique, safe divide and parse duration. All four first failed hidden tests, then passed after changing only their expected implementation file.
+- All four attempted mutation before the baseline test; Policy denied each attempt. The batch records 24 tool attempts (20 allowed, 4 denied), 8 hidden test runs, zero automatic Recovery retries, and mean runner latency of 16.174 seconds.
+- Preserved test output, diffs, event sequences, artifact hashes and derived file-scope judgments in `evals/reports/formal-train-recovery-repeat-v1.json`; teaching review: `docs/train-recovery-repeat-v1.md`.
+- Actual model API request counts, tokens and cost were not collected. A task invocation is not one provider request. The duration repair expanded behavior beyond the two evaluator assertions; passing this batch does not establish semantic minimality or broad stability.
+- The original matrix, holdout fixtures, prompts and Harness implementation were not changed. Next priority is trustworthy usage capture and automated scope judgments before further paid runs.
+
+## 2026-11-12 — usage and automatic scope judgment
+
+- Added callback-based `ModelUsageRecorder` to Baseline and Recovery. Successful response usage survives a later model failure; missing usage remains unknown or partial. Observed LangChain invocations are kept separate from uninstrumented provider HTTP retries.
+- Added SHA-256 file snapshots covering empty files, deletions and binary changes. Formal train results now automatically apply the manifest allowlist and require a nonempty allowed change; a passing test suite with an unlisted file is unsuccessful.
+- Added optional `model_usage` and `file_changes` artifacts without changing public runner signatures. Legacy task-invocation fields retain explicit semantics, and old reports are not backfilled.
+- Full network-free regression: `92 passed in 96.04s`. Synthetic usage in tests is not real token spend; prices and provider HTTP request counts remain unknown. Teaching review: `docs/usage-and-scope-v1.md`.
+
+## Next (historical backlog)
 
 - Preserve the 10-task Baseline matrix as the comparison set for the first enhanced Harness version.
 - Evaluate whether cross-process checkpoint persistence is needed before adding a database dependency.

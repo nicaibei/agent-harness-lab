@@ -7,11 +7,12 @@
 - 本地仓库：`D:\langgraph_learning\agent-harness-lab`
 - GitHub 仓库：`https://github.com/nicaibei/agent-harness-lab.git`
 - 当前分支：`main`
-- 最近功能里程碑提交：`2b4b0b3 feat(evals): add configuration recovery experiment`
-- `origin/main` 仍在：`bd7e9d1 feat(evals): add repository-shaped recovery fixture`
-- 交接文档会作为紧随其后的本地 docs 提交；两个本地提交都尚未推送成功。
+- 四项 train Recovery 重复评测已提交：`77e78b2 docs(evals): record train recovery repeat batch`；不要重复调用模型。
+- usage 采集、自动范围判定、测试和文档随本次里程碑提交；全量离线回归 `92 passed`。最近工作以第 22 节为准。
+- 本地最近记录的 `origin/main`：`e676de0`；仍有本地提交未推送，本次仅执行用户要求的本地提交。
+- Git 状态是 2026-11-12 的本地核验记录，远端未重新联网确认；最新提交以 `git log` 和 `git status` 为准。
 
-最近两次 `git push origin main` 都因连接 GitHub 的网络错误失败：一次是 connection reset，一次是无法连接 `github.com:443`。这不是提交失败，也不是 API Key 或 GitHub 权限错误。下一次网络正常时，先执行：
+之前推送和远端查询因 GitHub 连接被重置或无法连接 443 失败。提交保存在本地；网络正常时可执行：
 
 ```powershell
 cd D:\langgraph_learning\agent-harness-lab
@@ -295,9 +296,31 @@ Python 模块已经正确，唯一故意错误是：
 
 已完成正式任务集的统一 runner 审计。train 共 16 个任务，其中 14 个模型任务、2 个离线 Runtime 任务；holdout 共 14 个任务，其中 8 个模型任务、6 个离线 Security 任务。离线结果分别为 train `2/2`、holdout `6/6`，模型调用均为 `0`。这证明 split、execution mode 和离线 target 边界一致，不代表模型任务成功率。说明见 `docs/formal-split-audit-v1.md`，产物见 `evals/reports/formal-split-audit-v1.json` 及四个 split 计划/执行报告。
 
-下一轮拟重复 4 个已冻结的 train Recovery 任务，用来估计同一配置下的稳定性、延迟、测试轮次和工具调用量。自动安全审查要求对这四个 fixture 的源码和测试上下文发送到 DeepSeek 做具体授权；在授权前不执行真实批次，也不通过变通方式发送数据。
+四项真实 train Recovery 重复评测随后已在明确授权下完成，详见下一节。不要再因旧的待授权记录重复运行。
 
-## 17. 下一个对话的开场提示
+## 21. train Recovery 重复批次 v1
+
+四次运行：CSV `20261111T131603Z-97e74293`、稳定去重 `20261111T131631Z-1397a50f`、安全除法 `20261111T131706Z-64557ad5`、时长解析 `20261111T131739Z-7bc2a503`。均使用 formal runner，首次隐藏测试失败、第二次 `2 passed`，只修改各自允许实现文件，事后范围审计和恢复判定均为成功。
+
+关键观察：4 次均试图在首次测试前修改文件，均被 baseline gate 拒绝。每次 6 次工具尝试，5 次允许、1 次拒绝；平均 runner 耗时 16.174s；没有自动 Recovery 重试。拒绝的尝试未执行，不等于已发生越界修改，也不能声称模型主动先测后改。
+
+报告：`evals/reports/formal-train-recovery-repeat-v1.json` 保存完整测试输出、diff、事件和派生判定；复盘：`docs/train-recovery-repeat-v1.md`。四份 `formal-repeat-real-recovery-*-v1.json` 保留原 runner 摘要。报告与复盘已提交为 `77e78b2`；原始 `run.json` 保留在本地 runs 中。
+
+计量限制：`model_calls_requested=1` 是一次 Agent 任务调用，不是实际 provider 请求数；实际请求、token 和成本没有被 runner 采集。时长解析 diff 为 1507 字符，添加的秒单位、类型检查等行为未被两条隐藏断言覆盖。一次新增重复不足以证明稳定性，也没有配对对照可以估计成功率提升。
+
+下一步优先补实际 usage 和自动范围判定，再跑有明确新增验证目标的模型任务。原正式矩阵不自动重算；本轮没有运行 holdout。现有 holdout 含历史上已检查和运行的 fixture，不能称为完全未见测试集。
+
+## 22. 模型 usage 与自动范围判定 v1（2026-11-12）
+
+已完成 `harness/usage.py`、`harness/file_scope.py`，接入 Baseline、real Recovery 和 formal runner。新的 `run.v1` 可增加 `model_usage` 和 `file_changes`；formal 摘要自动输出 changed/unexpected files、`diff_scope_valid` 与 `task_success`。空文件和二进制修改也纳入哈希比较。公开函数签名没有变化，旧报告不补填。
+
+usage 使用 LangChain 模型回调，优先标准 `usage_metadata`，回退 provider token metadata，不重复叠加；后续模型异常仍保留此前观察值。`model_invocations` 是回调调用数，不是底层 HTTP 重试数。完整/部分/缺失数据分别标记，金额没有价格依据仍为 null。
+
+用户设计判断：未授权空文件不算成功（正确）；只有部分响应 usage 却想报完整 token（已纠正：应标 partial，只报观察小计）。复盘文档为 `docs/usage-and-scope-v1.md`，完整离线回归 `92 passed in 96.04s`，本轮没有真实模型运行。单次未来的真实冒烟只为验证 provider usage 链路，不重复原四项实验，也不回填历史成本。
+
+代码、测试和文档随本次里程碑提交；离线证据见 `evals/reports/usage-and-scope-offline-v1.json`。本次没有执行推送，不能把本地提交说成 GitHub 已同步。下一阶段可用一个 train 任务验证真实 usage 链路；价格表、真实 token 和底层请求计数仍不应声称已经验证。
+
+## 23. 下一个对话的开场提示
 
 可以直接把下面这句话发给下一个对话：
 
