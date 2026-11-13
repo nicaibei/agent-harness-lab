@@ -21,11 +21,19 @@ class TokenCounts(TypedDict):
     total_tokens: int
 
 
+class CacheCounts(TypedDict):
+    """Explicit provider cache breakdown for a single response."""
+
+    hit_tokens: int
+    miss_tokens: int
+
+
 @dataclass(frozen=True)
 class _Observation:
     status: Literal["started", "completed", "failed"]
     tokens: TokenCounts | None = None
     source: str | None = None
+    cache: CacheCounts | None = None
 
 
 def _token_counts(value: object, *, provider_keys: bool = False) -> TokenCounts | None:
@@ -42,6 +50,18 @@ def _token_counts(value: object, *, provider_keys: bool = False) -> TokenCounts 
     return TokenCounts(input_tokens=counts[0], output_tokens=counts[1], total_tokens=counts[2])
 
 
+def _cache_counts(value: object, input_tokens: int) -> CacheCounts | None:
+    if not isinstance(value, Mapping):
+        return None
+    hit = value.get("prompt_cache_hit_tokens")
+    miss = value.get("prompt_cache_miss_tokens")
+    if type(hit) is not int or type(miss) is not int or min(hit, miss) < 0:
+        return None
+    if hit + miss != input_tokens:
+        return None
+    return CacheCounts(hit_tokens=hit, miss_tokens=miss)
+
+
 def _response_usage(response: LLMResult) -> _Observation:
     # The runners use one chat prompt and one candidate per invocation.
     if len(response.generations) != 1 or len(response.generations[0]) != 1:
@@ -50,11 +70,36 @@ def _response_usage(response: LLMResult) -> _Observation:
     if not isinstance(generation, ChatGeneration) or not isinstance(generation.message, AIMessage):
         return _Observation("completed")
     message = generation.message
+    raw = (
+        response.llm_output.get("token_usage")
+        if isinstance(response.llm_output, Mapping)
+        else None
+    )
+    metadata_raw = message.response_metadata.get("token_usage")
     tokens = _token_counts(message.usage_metadata)
-    if tokens is not None:
-        return _Observation("completed", tokens, "usage_metadata")
-    tokens = _token_counts(message.response_metadata.get("token_usage"), provider_keys=True)
-    return _Observation("completed", tokens, "response_metadata.token_usage" if tokens else None)
+    source = "usage_metadata" if tokens is not None else None
+    if tokens is None:
+        tokens = _token_counts(metadata_raw, provider_keys=True)
+        source = "response_metadata.token_usage" if tokens is not None else None
+    if tokens is None:
+        tokens = _token_counts(raw, provider_keys=True)
+        source = "llm_output.token_usage" if tokens is not None else None
+    if tokens is None:
+        return _Observation("completed")
+    # A cache breakdown is valid only when it belongs to the same token totals.
+    caches = [
+        cache for candidate in (raw, metadata_raw)
+        if _token_counts(candidate, provider_keys=True) == tokens
+        if (cache := _cache_counts(candidate, tokens["input_tokens"])) is not None
+    ]
+    cache = caches[0] if caches and all(item == caches[0] for item in caches) else None
+    if cache is not None and isinstance(message.usage_metadata, Mapping):
+        details = message.usage_metadata.get("input_token_details")
+        if isinstance(details, Mapping) and "cache_read" in details:
+            cache_read = details["cache_read"]
+            if type(cache_read) is not int or cache_read != cache["hit_tokens"]:
+                cache = None
+    return _Observation("completed", tokens, source, cache)
 
 
 class ModelUsageRecorder(BaseCallbackHandler):
@@ -107,6 +152,16 @@ class ModelUsageRecorder(BaseCallbackHandler):
                 output_tokens=sum(item["output_tokens"] for item in covered),
                 total_tokens=sum(item["total_tokens"] for item in covered),
             )
+        cached = [item.cache for item in observations if item.cache is not None]
+        cache_status = "no_calls" if not observations else "unavailable"
+        if cached:
+            cache_status = "complete" if len(cached) == len(observations) else "partial"
+        cache_totals = None
+        if cached:
+            cache_totals = CacheCounts(
+                hit_tokens=sum(item["hit_tokens"] for item in cached),
+                miss_tokens=sum(item["miss_tokens"] for item in cached),
+            )
         return {
             "schema_version": "model-usage.v1",
             "model_invocations": len(observations),
@@ -117,6 +172,9 @@ class ModelUsageRecorder(BaseCallbackHandler):
             "token_usage_status": status,
             "observed_tokens": totals,
             "usage_sources": sorted({item.source for item in observations if item.source}),
+            "cache_usage_status": cache_status,
+            "responses_with_cache_usage": len(cached),
+            "observed_cache_tokens": cache_totals,
             "provider_http_requests": None,
             "provider_http_requests_status": "not_instrumented",
             "cost": None,

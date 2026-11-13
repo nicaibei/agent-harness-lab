@@ -1,0 +1,65 @@
+{
+  "schema_version": "formal-model-result.v1",
+  "task_id": "real-recovery-csv-row",
+  "split": "train",
+  "run_dir": "D:\\langgraph_learning\\agent-harness-lab\\runs\\recovery\\20261113T053833Z-4577c333",
+  "run_artifact": "D:\\langgraph_learning\\agent-harness-lab\\runs\\recovery\\20261113T053833Z-4577c333\\run.json",
+  "scenario": "real-model-hidden-evaluator",
+  "started_at": "2026-11-13T05:38:31.408317+00:00",
+  "finished_at": "2026-11-13T05:38:44.095781+00:00",
+  "latency_seconds": 12.677,
+  "model_calls_requested": 1,
+  "model_calls_requested_semantics": "legacy field: agent task invocations, not API requests",
+  "task_runs_requested": 1,
+  "completed": true,
+  "tests_passed": true,
+  "execution_error": null,
+  "model": "deepseek-flash",
+  "diff_chars": 364,
+  "test_run_count": 2,
+  "event_count": 23,
+  "expected_files": [
+    "row.py"
+  ],
+  "changed_files": [
+    "row.py"
+  ],
+  "unexpected_files": [],
+  "diff_scope_valid": true,
+  "scope_status": "checked",
+  "first_test_failed": true,
+  "task_success": true,
+  "model_usage": {
+    "schema_version": "model-usage.v1",
+    "model_invocations": 6,
+    "model_responses": 6,
+    "model_errors": 0,
+    "unfinished_invocations": 0,
+    "responses_with_usage": 6,
+    "token_usage_status": "complete",
+    "observed_tokens": {
+      "input_tokens": 22269,
+      "output_tokens": 563,
+      "total_tokens": 22832
+    },
+    "usage_sources": [
+      "usage_metadata"
+    ],
+    "cache_usage_status": "complete",
+    "responses_with_cache_usage": 6,
+    "observed_cache_tokens": {
+      "hit_tokens": 20480,
+      "miss_tokens": 1789
+    },
+    "provider_http_requests": null,
+    "provider_http_requests_status": "not_instrumented",
+    "cost": null,
+    "cost_status": "pricing_not_configured"
+  },
+  "cost_estimate": {
+    "amount_usd": null,
+    "status": "pricing_not_configured"
+  },
+  "cost": null,
+  "cost_status": "pricing_not_configured"
+}

@@ -1,0 +1,20 @@
+{
+  "schema_version": "price-reference.v1",
+  "id": "deepseek-flash-user-reference-20261113",
+  "source_url": "https://api-docs.deepseek.com/quick_start/pricing",
+  "source_kind": "user-provided-page-text",
+  "recorded_on": "2026-11-13",
+  "independently_verified": true,
+  "verified_on": "2026-11-13",
+  "historical_effective_from": null,
+  "historical_effective_until": null,
+  "model_as_reported": "deepseek-flash",
+  "currency": "USD",
+  "unit": "per_million_tokens",
+  "off_peak": {"hit": "0.003", "miss": "0.15", "output": "0.6"},
+  "peak": {"hit": "0.006", "miss": "0.3", "output": "1.2"},
+  "cny_source_url": "https://api-docs.deepseek.com/zh-cn/quick_start/pricing/",
+  "cny_off_peak": {"hit": "0.02", "miss": "1", "output": "4"},
+  "cny_peak": {"hit": "0.04", "miss": "2", "output": "8"},
+  "note": "Reference only. Not an executable price interval or proof of historical prices."
+}

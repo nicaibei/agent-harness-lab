@@ -320,7 +320,25 @@ usage 使用 LangChain 模型回调，优先标准 `usage_metadata`，回退 pro
 
 代码、测试和文档随本次里程碑提交；离线证据见 `evals/reports/usage-and-scope-offline-v1.json`。本次没有执行推送，不能把本地提交说成 GitHub 已同步。下一阶段可用一个 train 任务验证真实 usage 链路；价格表、真实 token 和底层请求计数仍不应声称已经验证。
 
-## 23. 下一个对话的开场提示
+## 23. 真实 usage 冒烟（2026-11-13）
+
+一次 DeepSeek `real-recovery-csv-row` 任务已完成，运行 ID `20261113T051810Z-3e4b0c24`。首次隐藏测试 2 项失败，最终 2 项通过；仅修改 `row.py`，`diff_scope_valid=true`、`task_success=true`。Agent 首次尝试编辑被基线测试 Policy 拒绝，随后测试并修复；事件记录 `recovery_retries=0`，不能宣称中间件自动重试。
+
+回调观察到 8 次调用和 8 次响应，全部带有效 usage：输入 28529、输出 748、总计 29277 tokens，状态为 `complete`。摘要与原始记录一致；底层 HTTP 次数和金额未知。详见 `docs/usage-smoke-csv-row-v1.md` 和 `evals/reports/formal-usage-smoke-csv-row-v1.json`；原始 `runs/` 被忽略，不要重跑以补证据。本次是单个 train 冒烟，不代表整体成功率。
+
+## 24. 缓存用量与费用估算离线实验（2026-11-13）
+
+新增缓存命中/未命中采集和显式价格区间估算，详见 `docs/cache-pricing-offline-v1.md`。用户提供的价格文本保存在 `evals/reports/deepseek-flash-price-reference-20261113.json`；后来核对了官方页面当前费率，但未核实历史有效期，不可自动作为可执行价格区间。使用完整缓存明细、匹配模型和覆盖整个运行的显式价格区间才能估算；估算与实际账单分开，跨时段和缺失明细不输出完整金额。完整离线回归 `98 passed`。
+
+该离线阶段没有调用真实模型；之后完成的一次真实验证见第 25 节。更早的 CSV 冒烟未记录缓存明细，不能回填。
+
+## 25. 真实缓存用量冒烟（2026-11-13）
+
+真实 DeepSeek CSV 运行 `20261113T053833Z-4577c333`：6 次模型响应均采集到缓存明细，输入 22269，其中命中 20480、未命中 1789；输出 563，总计 22832 tokens。首次隐藏测试 2 项失败、最终 2 项通过，仅修改允许的 `row.py`，任务成功；先测试再修改，Policy 拒绝和 Recovery 自动重试均为 0。证据见 `docs/cache-usage-real-smoke-v1.md` 和 `evals/reports/formal-cache-smoke-csv-row-v1.json`。
+
+已查阅英中官方价格页，中文账户页面显示人民币。按本次空闲时段及当前中文页面价格，条件估算为 0.0044506 元；页面未注明历史有效期。平台用量刷新前后增量 6 次请求和 22832 tokens，与本次记录一致；金额按分显示且为当日聚合，不能核对单次精确扣费。原 CSV 冒烟没有缓存明细，不得回填。
+
+## 26. 下一个对话的开场提示
 
 可以直接把下面这句话发给下一个对话：
 

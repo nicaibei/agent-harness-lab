@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 from collections import Counter
+from collections.abc import Mapping
 from datetime import UTC, datetime
 from pathlib import Path
 import subprocess
@@ -14,6 +15,7 @@ from typing import Literal
 
 from evals.formal_task_manifest import FormalTaskSpec, load_manifest
 from harness.file_scope import assess_file_scope
+from harness.pricing import estimate_cost
 
 
 PLAN_SCHEMA_VERSION = "formal-plan.v1"
@@ -109,7 +111,9 @@ def run_offline_tasks(*, split: str | None = None) -> dict[str, object]:
     }
 
 
-def run_model_task(task_id: str) -> dict[str, object]:
+def run_model_task(
+    task_id: str, *, pricing: Mapping[str, object] | None = None,
+) -> dict[str, object]:
     """Run exactly one explicitly selected train task through its existing runner."""
     task = next((item for item in load_manifest() if item.task_id == task_id), None)
     if task is None:
@@ -157,8 +161,15 @@ def run_model_task(task_id: str) -> dict[str, object]:
         "event_count": len(report.get("events", [])) if isinstance(report.get("events"), list) else 0,
         **assessment,
         "model_usage": report.get("model_usage"),
+        "cost_estimate": estimate_cost(
+            report.get("model_usage"), pricing, model=report.get("model"),
+            started_at=report.get("started_at"), finished_at=report.get("finished_at"),
+        ),
         "cost": None,
-        "cost_status": "pricing_not_configured" if report.get("model_usage") else "not_collected_by_runner",
+        "cost_status": (
+            "not_collected_by_runner" if not report.get("model_usage") else
+            "pricing_not_configured" if pricing is None else "actual_cost_not_recorded"
+        ),
     }
 
 
@@ -199,6 +210,7 @@ def main() -> None:
     """Write an offline execution plan without calling a model."""
     parser = argparse.ArgumentParser(description="Build the formal evaluation execution plan.")
     parser.add_argument("--split", choices=("train", "holdout"))
+    parser.add_argument("--pricing", type=Path, help="Explicit JSON price interval for an estimate.")
     parser.add_argument(
         "--output",
         type=Path,
@@ -223,7 +235,12 @@ def main() -> None:
         print(f"Passed: {result['passed']}/{result['task_count']}; model calls: 0")
         return
     if args.run_model is not None:
-        result = run_model_task(args.run_model)
+        pricing_data = (
+            json.loads(args.pricing.read_text(encoding="utf-8")) if args.pricing else None
+        )
+        if pricing_data is not None and not isinstance(pricing_data, dict):
+            parser.error("Pricing JSON must contain an object.")
+        result = run_model_task(args.run_model, pricing=pricing_data)
         output = write_plan(result, args.output)
         print(f"Model result: {output}")
         print(

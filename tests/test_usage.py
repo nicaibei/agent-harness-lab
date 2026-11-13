@@ -85,3 +85,49 @@ def test_invalid_provider_counts_are_not_reported_as_complete() -> None:
     })), run_id=uuid4())
     assert recorder.summary()["token_usage_status"] == "unavailable"
     assert recorder.summary()["observed_tokens"] is None
+
+
+def test_real_chatopenai_conversion_preserves_deepseek_cache_fields_offline() -> None:
+    from langchain_openai import ChatOpenAI
+
+    model = ChatOpenAI(model="offline", api_key="offline-placeholder")
+    result = model._create_chat_result({
+        "model": "offline",
+        "choices": [{"message": {"role": "assistant", "content": "done"}, "finish_reason": "stop"}],
+        "usage": {"prompt_tokens": 10, "completion_tokens": 2, "total_tokens": 12,
+                  "prompt_cache_hit_tokens": 7, "prompt_cache_miss_tokens": 3},
+    })
+    recorder = ModelUsageRecorder()
+    recorder.on_llm_end(LLMResult(generations=[result.generations], llm_output=result.llm_output), run_id=uuid4())
+    summary = recorder.summary()
+    assert summary["token_usage_status"] == "complete"
+    assert summary["cache_usage_status"] == "complete"
+    assert summary["observed_cache_tokens"] == {"hit_tokens": 7, "miss_tokens": 3}
+
+
+def test_cache_breakdown_rejects_missing_invalid_or_conflicting_counts() -> None:
+    recorder = ModelUsageRecorder()
+    message = AIMessage(content="ok", usage_metadata={"input_tokens": 10, "output_tokens": 2, "total_tokens": 12})
+    def raw(hit: object, miss: object) -> dict[str, object]:
+        return {"token_usage": {"prompt_tokens": 10, "completion_tokens": 2, "total_tokens": 12,
+                                "prompt_cache_hit_tokens": hit, "prompt_cache_miss_tokens": miss}}
+    recorder.on_llm_end(LLMResult(generations=[[ChatGeneration(message=message)]], llm_output=raw(7, 3)), run_id=uuid4())
+    for hit, miss in ((7, None), (True, 9), (7, 4), (-1, 11)):
+        recorder.on_llm_end(LLMResult(generations=[[ChatGeneration(message=message)]], llm_output=raw(hit, miss)), run_id=uuid4())
+    summary = recorder.summary()
+    assert summary["token_usage_status"] == "complete"
+    assert summary["cache_usage_status"] == "partial"
+    assert summary["responses_with_cache_usage"] == 1
+    assert summary["observed_cache_tokens"] == {"hit_tokens": 7, "miss_tokens": 3}
+
+    conflicting = AIMessage(content="ok", usage_metadata={"input_tokens": 10, "output_tokens": 2, "total_tokens": 12},
+                            response_metadata=raw(6, 4))
+    recorder = ModelUsageRecorder()
+    recorder.on_llm_end(LLMResult(generations=[[ChatGeneration(message=conflicting)]], llm_output=raw(7, 3)), run_id=uuid4())
+    assert recorder.summary()["cache_usage_status"] == "unavailable"
+
+    conflicting = AIMessage(content="ok", usage_metadata={"input_tokens": 10, "output_tokens": 2,
+                            "total_tokens": 12, "input_token_details": {"cache_read": 6}})
+    recorder = ModelUsageRecorder()
+    recorder.on_llm_end(LLMResult(generations=[[ChatGeneration(message=conflicting)]], llm_output=raw(7, 3)), run_id=uuid4())
+    assert recorder.summary()["cache_usage_status"] == "unavailable"

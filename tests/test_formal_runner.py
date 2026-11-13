@@ -99,3 +99,43 @@ def test_recovery_requires_first_failure_and_nonempty_allowed_change() -> None:
     report["test_runs"] = ['{"success": false}', '{"success": true}']
     report["file_changes"] = file_changes({"row.py": "old"}, {"row.py": "old"})
     assert _assess_model_result(task, report)["task_success"] is False
+
+
+def test_model_task_reports_estimate_separately_from_unknown_actual_cost(
+    tmp_path, monkeypatch,
+) -> None:
+    import json
+
+    import agent_app.baseline as baseline
+    from evals.formal_runner import run_model_task
+
+    run_dir = tmp_path / "run"
+    run_dir.mkdir()
+    report = {
+        "model": "example",
+        "started_at": "2026-11-13T05:18:00+00:00",
+        "finished_at": "2026-11-13T05:19:00+00:00",
+        "model_usage": {
+            "token_usage_status": "complete",
+            "cache_usage_status": "complete",
+            "observed_tokens": {
+                "input_tokens": 1000, "output_tokens": 100, "total_tokens": 1100,
+            },
+            "observed_cache_tokens": {"hit_tokens": 600, "miss_tokens": 400},
+        },
+    }
+    (run_dir / "run.json").write_text(json.dumps(report), encoding="utf-8")
+    monkeypatch.setattr(baseline, "run_task", lambda *args, **kwargs: run_dir)
+    pricing = {
+        "id": "offline", "source": "offline", "model": "example", "currency": "USD",
+        "valid_from": "2026-11-13T05:00:00+00:00",
+        "valid_until": "2026-11-13T06:00:00+00:00",
+        "hit_per_million": "0.003", "miss_per_million": "0.15",
+        "output_per_million": "0.6",
+    }
+    result = run_model_task("calculator-add-floats", pricing=pricing)
+    assert result["cost_estimate"]["amount"] == "0.0001218"
+    assert result["cost_estimate"]["currency"] == "USD"
+    assert result["cost_estimate"]["status"] == "estimated"
+    assert result["cost"] is None
+    assert result["cost_status"] == "actual_cost_not_recorded"
