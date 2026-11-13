@@ -62,3 +62,5 @@
 统一 runner 目前覆盖过 7 个不同 train 模型任务（3 个 Baseline 冒烟任务、4 个 Recovery 任务），不是统一批次的 14 项 train 完整评测。本轮不重算原矩阵，也不合并历史运行来宣称稳定性。
 
 清单中的 holdout 包含历史上已经运行和检查过的 fixture；它们可以保持后续不用于调参，但不能作为完全未见数据来主张无偏泛化。新的未见验证应单独版本化，不在本轮静默改变冻结清单。
+
+2026-11-13 完成逐项污染审计：14 个 holdout 全部有历史暴露证据。8 个模型任务在创建/冻结正式 split 之前已有 14 次真实运行；6 个安全任务直接复用仓库公开 pytest target，并已离线运行。v1 保留为历史回归集，不再作为 pristine blind holdout。审计细节见 [holdout contamination audit](holdout-contamination-audit-v1.md) 和 [结构化报告](../evals/reports/holdout-contamination-audit-v1.json)。

@@ -1,0 +1,41 @@
+{
+  "schema_version": "holdout-contamination-audit.v1",
+  "audited_on": "2026-11-13",
+  "audit_commit": "eb65cff9a83a1a01407f20ac9958e8f6ec72563b",
+  "manifest": "evals/formal_tasks.json",
+  "manifest_sha256": "f3ba5750a6c03f03cf64c97e1f674b7bba0c4a692ecc89dac9c4efabc9d4a47f",
+  "audit_mode": "read-only evidence inventory",
+  "model_calls": 0,
+  "counts": {
+    "manifest_tasks": 30,
+    "train_tasks": 16,
+    "holdout_tasks": 14,
+    "holdout_tasks_unsuitable_for_pristine_blind_claim": 14,
+    "holdout_model_tasks": 8,
+    "historical_real_agent_runs": 14,
+    "public_offline_security_tasks": 6,
+    "offline_security_tasks_previously_executed": 6
+  },
+  "model_tasks": [
+    {"task_id":"real-recovery-order-total","historical_runs":2,"run_ids":["20261107T052728Z-a1313c18","20261107T083650Z-0dd3a5f4"]},
+    {"task_id":"real-recovery-temperature-report","historical_runs":2,"run_ids":["20261107T070150Z-d2125766","20261107T083816Z-bbcd785e"]},
+    {"task_id":"real-recovery-inventory-checkout","historical_runs":1,"run_ids":["20261107T091935Z-160b0df4"]},
+    {"task_id":"real-recovery-inventory-config","historical_runs":3,"run_ids":["20261107T095602Z-fe966317","20261107T100134Z-9f4eff5c","20261107T100202Z-8eb54354"]},
+    {"task_id":"real-recovery-startup-import","historical_runs":3,"run_ids":["20261107T102823Z-e6225779","20261107T103524Z-1109cb1b","20261107T103640Z-ee3b3b33"]},
+    {"task_id":"real-recovery-missing-dependency","historical_runs":1,"run_ids":["20261108T041536Z-8ac3139d"]},
+    {"task_id":"real-recovery-missing-dependency-install","historical_runs":1,"run_ids":["20261108T044830Z-057a2535"]},
+    {"task_id":"real-recovery-dependency-version-conflict","historical_runs":1,"run_ids":["20261108T051319Z-bffefc3d"]}
+  ],
+  "offline_security_tasks": [
+    {"task_id":"policy-path-traversal-deny","evaluator":"tests/test_policy.py::test_denies_path_traversal_before_handler"},
+    {"task_id":"policy-sensitive-file-deny","evaluator":"tests/test_policy.py::test_denies_sensitive_file"},
+    {"task_id":"policy-delete-deny","evaluator":"tests/test_policy.py::test_denies_delete"},
+    {"task_id":"policy-unknown-tool-deny","evaluator":"tests/test_policy.py::test_denies_unknown_tool_and_budget_exhaustion"},
+    {"task_id":"policy-pytest-allow","evaluator":"tests/test_policy.py::test_classifies_commands_by_execution_risk"},
+    {"task_id":"policy-install-needs-approval","evaluator":"tests/test_policy.py::test_requires_and_records_approval_for_review_commands"}
+  ],
+  "conclusion": "All 14 manifest holdout tasks are historically exposed to this project development or evaluation process; v1 cannot support a pristine unseen-task claim.",
+  "recommended_use": "historical regression only; keep separate from future blind v2 evaluation",
+  "manifest_modified": false,
+  "models_called": false
+}

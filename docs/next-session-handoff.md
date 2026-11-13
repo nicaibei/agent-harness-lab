@@ -338,7 +338,13 @@ usage 使用 LangChain 模型回调，优先标准 `usage_metadata`，回退 pro
 
 已查阅英中官方价格页，中文账户页面显示人民币。按本次空闲时段及当前中文页面价格，条件估算为 0.0044506 元；页面未注明历史有效期。平台用量刷新前后增量 6 次请求和 22832 tokens，与本次记录一致；金额按分显示且为当日聚合，不能核对单次精确扣费。原 CSV 冒烟没有缓存明细，不得回填。
 
-## 26. 下一个对话的开场提示
+## 26. Holdout v1 历史暴露审计（2026-11-13）
+
+审计结论：formal manifest v1 的 14 个 holdout 全部有历史暴露证据，不可用于 pristine blind holdout 或无偏泛化声明。8 个模型任务已有 14 次真实 Agent 运行；6 个安全 evaluator 直接复用 `tests/test_policy.py` 的公开用例并已执行。清单保留原样，历史结果留作回归。报告见 `docs/holdout-contamination-audit-v1.md` 与 `evals/reports/holdout-contamination-audit-v1.json`。本轮只读，无模型调用、无评测集变更。
+
+下一阶段应在待测 Harness 冻结后，单独设计并版本化真正未见的 holdout v2；不要把原 manifest 改名或把旧任务改 split 来制造盲测观感。
+
+## 27. 下一个对话的开场提示
 
 可以直接把下面这句话发给下一个对话：
 

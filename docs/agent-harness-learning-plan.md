@@ -172,6 +172,8 @@
 - [x] 完成 Checkpoint 跨进程恢复 v2 离线实验；
 - [x] 固定运行产物 schema 的最终版本；
 - [x] 建立 30 个任务的 train/holdout 正式评估集 v1；
+- [x] 审计正式评测集 v1 的 holdout 历史暴露，并限定其作为历史回归集；
+- [ ] 在冻结 Harness 后设计独立 holdout v2，并固定 evaluator 和哈希；
 - [x] 完成 3 个 train 任务的真实模型 runner 冒烟运行；
 - [x] 完成四项 train Recovery 真实重复评测，保存首次/最终测试、Policy 拒绝及范围审计证据；
 - [x] 采集模型回调与 token usage，并把范围检查接入正式 runner（92 项离线回归；不代表底层 HTTP 次数）；
